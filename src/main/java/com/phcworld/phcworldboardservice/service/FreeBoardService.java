@@ -57,7 +57,6 @@ public class FreeBoardService {
 				.mutate().baseUrl(env.getProperty("user_service.url"))
 				.build()
 				.get()
-//				.uri(String.format("http://localhost:1414/users/%s",freeBoard.getWriterId()))
 				.uri(uriBuilder -> uriBuilder
 						.path("/{id}")
 						.build(freeBoard.getWriterId()))
@@ -65,16 +64,6 @@ public class FreeBoardService {
 				.retrieve()
 				.bodyToMono(UserResponseDto.class)
 				.block();
-
-//		UserResponseDto user = WebClient.create("http://localhost:1414/users")
-//				.get()
-//				.uri(uriBuilder -> uriBuilder
-//						.path("/{id}")
-//						.build(freeBoard.getWriterId()))
-//				.header(HttpHeaders.AUTHORIZATION, token)
-//				.retrieve()
-//				.bodyToMono(UserResponseDto.class)
-//				.block();
 
 		return FreeBoardResponseDto.builder()
 				.id(freeBoard.getId())
@@ -105,27 +94,6 @@ public class FreeBoardService {
 				.header(HttpHeaders.AUTHORIZATION, token)
 				.retrieve()
 				.bodyToMono(new ParameterizedTypeReference<Map<String, UserResponseDto>>() {});
-
-//		Mono<Map<String, UserResponseDto>> response = WebClient.create("http://localhost:1414/users")
-//				.get()
-//				.uri(uriBuilder -> uriBuilder
-//						.path("")
-//						.queryParam("userIds", userIds)
-//						.build())
-//				.header(HttpHeaders.AUTHORIZATION, token)
-//				.retrieve()
-//				.bodyToMono(new ParameterizedTypeReference<Map<String, UserResponseDto>>() {});
-
-//		Mono<Map<String, UserResponseDto>> response = webClient
-//				.get()
-//				.uri(uriBuilder -> uriBuilder
-//						.path("")
-//						.queryParam("userIds", userIds)
-//						.build())
-//				.uri("http://localhost:1414/users")
-//				.header(HttpHeaders.AUTHORIZATION, token)
-//				.retrieve()
-//				.bodyToMono(new ParameterizedTypeReference<Map<String, UserResponseDto>>() {});
 
 		Map<String, UserResponseDto> users = response.block();
 
@@ -179,7 +147,18 @@ public class FreeBoardService {
 				.block();
 
 		//rest 통신
-		List<FreeBoardAnswerResponseDto> answers = new ArrayList<>();
+		List<FreeBoardAnswerResponseDto> answers = webClient.build()
+//				.mutate().baseUrl("http://localhost:9634/users")
+				.mutate().baseUrl(env.getProperty("answer_service.url"))
+				.build()
+				.get()
+				.uri(uriBuilder -> uriBuilder
+						.path("/{id}/answers")
+						.build(freeBoard.getId()))
+				.header(HttpHeaders.AUTHORIZATION, token)
+				.retrieve()
+				.bodyToMono(new ParameterizedTypeReference<List<FreeBoardAnswerResponseDto>>() {})
+				.block();
 
 		FreeBoardResponseDto response = FreeBoardResponseDto.builder()
 				.id(freeBoard.getId())
@@ -254,6 +233,11 @@ public class FreeBoardService {
 				.statusCode(200)
 				.message("삭제 성공")
 				.build();
+	}
+
+	public boolean existFreeBoard(Long id){
+		return freeBoardRepository.findById(id)
+				.isPresent();
 	}
 
 }

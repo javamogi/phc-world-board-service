@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
@@ -54,7 +55,9 @@ public class TokenProvider {
     }
 
     private Claims parseClaims(String accessToken) {
-        byte[] keyBytes = Decoders.BASE64.decode(env.getProperty("jwt.secret"));
+        String secret = env.getProperty("jwt.secret");
+        String keyBase64Encoded = Base64.getEncoder().encodeToString(secret.getBytes());
+        byte[] keyBytes = Decoders.BASE64.decode(keyBase64Encoded);
         Key key = Keys.hmacShaKeyFor(keyBytes);
         try {
             return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
@@ -64,7 +67,9 @@ public class TokenProvider {
     }
 
     public String generateAccessToken(Authentication authentication, long now){
-        byte[] keyBytes = Decoders.BASE64.decode(env.getProperty("jwt.secret"));
+        String secret = env.getProperty("jwt.secret");
+        String keyBase64Encoded = Base64.getEncoder().encodeToString(secret.getBytes());
+        byte[] keyBytes = Decoders.BASE64.decode(keyBase64Encoded);
         Key key = Keys.hmacShaKeyFor(keyBytes);
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();

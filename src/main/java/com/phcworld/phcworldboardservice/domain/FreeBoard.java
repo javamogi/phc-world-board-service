@@ -59,7 +59,7 @@ public class FreeBoard {
 	private Integer count = 0;
 
 	@ColumnDefault("false")
-	private Boolean isDeleted = false;
+	private Boolean isDeleted;
 
 	@ColumnDefault("0")
 	@Builder.Default
