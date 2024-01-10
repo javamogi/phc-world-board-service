@@ -74,7 +74,7 @@ class FreeBoardApiControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -96,7 +96,7 @@ class FreeBoardApiControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
     @Test

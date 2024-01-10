@@ -59,7 +59,7 @@ public class FreeBoard {
 	private Integer count = 0;
 
 	@ColumnDefault("false")
-	private Boolean deleted = false;
+	private Boolean isDeleted = false;
 
 	@ColumnDefault("0")
 	@Builder.Default
@@ -96,7 +96,7 @@ public class FreeBoard {
 	}
 
 	public void delete() {
-		this.deleted = true;
+		this.isDeleted = true;
 	}
 
 //	public List<FreeBoardAnswer> getFreeBoardAnswers() {

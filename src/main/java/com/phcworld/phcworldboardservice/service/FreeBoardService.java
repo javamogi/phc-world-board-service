@@ -1,11 +1,11 @@
 package com.phcworld.phcworldboardservice.service;
 
+import com.phcworld.phcworldboardservice.domain.Authority;
+import com.phcworld.phcworldboardservice.domain.FreeBoard;
 import com.phcworld.phcworldboardservice.dto.*;
 import com.phcworld.phcworldboardservice.exception.model.DeletedEntityException;
 import com.phcworld.phcworldboardservice.exception.model.NotFoundException;
 import com.phcworld.phcworldboardservice.exception.model.UnauthorizedException;
-import com.phcworld.phcworldboardservice.domain.Authority;
-import com.phcworld.phcworldboardservice.domain.FreeBoard;
 import com.phcworld.phcworldboardservice.repository.FreeBoardRepository;
 import com.phcworld.phcworldboardservice.security.utils.SecurityUtil;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +14,12 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +34,8 @@ public class FreeBoardService {
 //	private final UploadFileService uploadFileService;
 	private final RestTemplate restTemplate;
 	private final Environment env;
+//	private final WebClient webClient;
+	private final WebClient.Builder webClient;
 
 	@Transactional
 	public FreeBoardResponseDto registerFreeBoard(FreeBoardRequestDto request, String token) {
@@ -49,19 +52,29 @@ public class FreeBoardService {
 
 		freeBoardRepository.save(freeBoard);
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.set("Authorization", token);
-		HttpEntity<List<String>> entity = new HttpEntity<>(headers);
+		UserResponseDto user = webClient.build()
+//				.mutate().baseUrl("http://localhost:9634/users")
+				.mutate().baseUrl(env.getProperty("user_service.url"))
+				.build()
+				.get()
+//				.uri(String.format("http://localhost:1414/users/%s",freeBoard.getWriterId()))
+				.uri(uriBuilder -> uriBuilder
+						.path("/{id}")
+						.build(freeBoard.getWriterId()))
+				.header(HttpHeaders.AUTHORIZATION, token)
+				.retrieve()
+				.bodyToMono(UserResponseDto.class)
+				.block();
 
-		String userUrl = String.format(env.getProperty("user_service.url") + "/%s", freeBoard.getWriterId());
-		ResponseEntity<UserResponseDto> userResponse =
-				restTemplate.exchange(userUrl,
-						HttpMethod.GET,
-						entity,
-						new ParameterizedTypeReference<UserResponseDto>() {
-						});
-
-		UserResponseDto user = userResponse.getBody();
+//		UserResponseDto user = WebClient.create("http://localhost:1414/users")
+//				.get()
+//				.uri(uriBuilder -> uriBuilder
+//						.path("/{id}")
+//						.build(freeBoard.getWriterId()))
+//				.header(HttpHeaders.AUTHORIZATION, token)
+//				.retrieve()
+//				.bodyToMono(UserResponseDto.class)
+//				.block();
 
 		return FreeBoardResponseDto.builder()
 				.id(freeBoard.getId())
@@ -80,20 +93,41 @@ public class FreeBoardService {
 				.distinct()
 				.toList();
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.set("Authorization", token);
+		Mono<Map<String, UserResponseDto>> response = webClient.build()
+//				.mutate().baseUrl("http://localhost:9634/users")
+				.mutate().baseUrl(env.getProperty("user_service.url"))
+				.build()
+				.get()
+				.uri(uriBuilder -> uriBuilder
+						.path("")
+						.queryParam("userIds", userIds)
+						.build())
+				.header(HttpHeaders.AUTHORIZATION, token)
+				.retrieve()
+				.bodyToMono(new ParameterizedTypeReference<Map<String, UserResponseDto>>() {});
 
-		HttpEntity<List<String>> entity = new HttpEntity<>(userIds, headers);
+//		Mono<Map<String, UserResponseDto>> response = WebClient.create("http://localhost:1414/users")
+//				.get()
+//				.uri(uriBuilder -> uriBuilder
+//						.path("")
+//						.queryParam("userIds", userIds)
+//						.build())
+//				.header(HttpHeaders.AUTHORIZATION, token)
+//				.retrieve()
+//				.bodyToMono(new ParameterizedTypeReference<Map<String, UserResponseDto>>() {});
 
-		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(env.getProperty("user_service.url"))
-				.queryParam("userIds", userIds);
-		ResponseEntity<Map<String, UserResponseDto>> userResponse =
-				restTemplate.exchange(builder.toUriString(),
-						HttpMethod.GET,
-						entity,
-						new ParameterizedTypeReference<Map<String, UserResponseDto>>() {
-						});
-		Map<String, UserResponseDto> users = userResponse.getBody();
+//		Mono<Map<String, UserResponseDto>> response = webClient
+//				.get()
+//				.uri(uriBuilder -> uriBuilder
+//						.path("")
+//						.queryParam("userIds", userIds)
+//						.build())
+//				.uri("http://localhost:1414/users")
+//				.header(HttpHeaders.AUTHORIZATION, token)
+//				.retrieve()
+//				.bodyToMono(new ParameterizedTypeReference<Map<String, UserResponseDto>>() {});
+
+		Map<String, UserResponseDto> users = response.block();
 
 		return list.stream()
 				.map(f -> {
@@ -111,7 +145,7 @@ public class FreeBoardService {
 	public Map<String, Object> getFreeBoard(Long id, String token) {
 		FreeBoard freeBoard = freeBoardRepository.findById(id)
 				.orElseThrow(NotFoundException::new);
-		if(freeBoard.getDeleted()){
+		if(freeBoard.getIsDeleted()){
 			throw new DeletedEntityException();
 		}
 		String userId = SecurityUtil.getCurrentMemberId();
@@ -131,19 +165,18 @@ public class FreeBoardService {
 
 		Map<String, Object> map = new HashMap<>();
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.set("Authorization", token);
-		HttpEntity<List<String>> entity = new HttpEntity<>(headers);
-
-		String userUrl = String.format(env.getProperty("user_service.url") + "/%s", freeBoard.getWriterId());
-		ResponseEntity<UserResponseDto> userResponse =
-				restTemplate.exchange(userUrl,
-						HttpMethod.GET,
-						entity,
-						new ParameterizedTypeReference<UserResponseDto>() {
-						});
-
-		UserResponseDto user = userResponse.getBody();
+		UserResponseDto user = webClient.build()
+//				.mutate().baseUrl("http://localhost:9634/users")
+				.mutate().baseUrl(env.getProperty("user_service.url"))
+				.build()
+				.get()
+				.uri(uriBuilder -> uriBuilder
+						.path("/{id}")
+						.build(freeBoard.getWriterId()))
+				.header(HttpHeaders.AUTHORIZATION, token)
+				.retrieve()
+				.bodyToMono(UserResponseDto.class)
+				.block();
 
 		//rest 통신
 		List<FreeBoardAnswerResponseDto> answers = new ArrayList<>();
@@ -165,7 +198,7 @@ public class FreeBoardService {
 	public FreeBoardResponseDto updateFreeBoard(FreeBoardRequestDto request, String token) {
 		FreeBoard freeBoard = freeBoardRepository.findById(request.id())
 				.orElseThrow(NotFoundException::new);
-		if(freeBoard.getDeleted()){
+		if(freeBoard.getIsDeleted()){
 			throw new DeletedEntityException();
 		}
 		String userId = SecurityUtil.getCurrentMemberId();
@@ -180,19 +213,18 @@ public class FreeBoardService {
 //		freeBoard.update(request.title(), contents);
 		freeBoard.update(request.title(), request.contents());
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.set("Authorization", token);
-		HttpEntity<List<String>> entity = new HttpEntity<>(headers);
-
-		String userUrl = String.format(env.getProperty("user_service.url") + "/%s", freeBoard.getWriterId());
-		ResponseEntity<UserResponseDto> userResponse =
-				restTemplate.exchange(userUrl,
-						HttpMethod.GET,
-						entity,
-						new ParameterizedTypeReference<UserResponseDto>() {
-						});
-
-		UserResponseDto user = userResponse.getBody();
+		UserResponseDto user = webClient.build()
+//				.mutate().baseUrl("http://localhost:9634/users")
+				.mutate().baseUrl(env.getProperty("user_service.url"))
+				.build()
+				.get()
+				.uri(uriBuilder -> uriBuilder
+						.path("/{id}")
+						.build(freeBoard.getWriterId()))
+				.header(HttpHeaders.AUTHORIZATION, token)
+				.retrieve()
+				.bodyToMono(UserResponseDto.class)
+				.block();
 
 		return FreeBoardResponseDto.builder()
 				.id(freeBoard.getId())
@@ -206,7 +238,7 @@ public class FreeBoardService {
 	public SuccessResponseDto deleteFreeBoard(Long id) {
 		FreeBoard freeBoard = freeBoardRepository.findById(id)
 				.orElseThrow(NotFoundException::new);
-		if(freeBoard.getDeleted()){
+		if(freeBoard.getIsDeleted()){
 			throw new DeletedEntityException();
 		}
 		String userId = SecurityUtil.getCurrentMemberId();
