@@ -191,4 +191,11 @@ class FreeBoardServiceTest {
             freeBoardService.deleteFreeBoard(1L);
         });
     }
+
+    @Test
+    void 게시글_존재_확인(){
+        when(freeBoardService.existFreeBoard(1L)).thenReturn(false);
+        boolean result = freeBoardService.existFreeBoard(1L);
+        assertThat(result).isFalse();
+    }
 }

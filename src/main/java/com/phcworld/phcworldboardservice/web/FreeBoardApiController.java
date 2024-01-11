@@ -53,4 +53,9 @@ public class FreeBoardApiController {
     public SuccessResponseDto deleteBoard(@PathVariable(name = "freeBoardId") Long freeBoardId){
         return freeBoardService.deleteFreeBoard(freeBoardId);
     }
+
+    @GetMapping("/{freeBoardId}/exist")
+    public boolean getExist(@PathVariable(name = "freeBoardId") Long freeBoardId){
+        return freeBoardService.existFreeBoard(freeBoardId);
+    }
 }
