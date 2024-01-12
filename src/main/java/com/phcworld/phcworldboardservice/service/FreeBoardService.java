@@ -153,7 +153,7 @@ public class FreeBoardService {
 				.build()
 				.get()
 				.uri(uriBuilder -> uriBuilder
-						.path("/{id}/answers")
+						.path("/freeboards/{id}")
 						.build(freeBoard.getId()))
 				.header(HttpHeaders.AUTHORIZATION, token)
 				.retrieve()

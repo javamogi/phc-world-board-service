@@ -99,6 +99,10 @@ public class FreeBoard {
 		this.isDeleted = true;
 	}
 
+	public void addCountOfAnswer() {
+		this.countOfAnswer++;
+	}
+
 //	public List<FreeBoardAnswer> getFreeBoardAnswers() {
 //		if(freeBoardAnswers == null){
 //			return new ArrayList<>();
