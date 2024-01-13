@@ -7,6 +7,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class Payload {
+    private String board_id;
     private String writer_id;
     private int count;
     private int count_of_answer;

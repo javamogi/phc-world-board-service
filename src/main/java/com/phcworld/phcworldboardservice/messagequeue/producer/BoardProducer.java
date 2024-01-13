@@ -20,6 +20,7 @@ public class BoardProducer {
     private final ObjectMapper mapper;
 
     List<Field> fields = Arrays.asList(
+            new Field("string", true, "board_id"),
             new Field("int32", false, "count"),
             new Field("int32", false, "count_of_answer"),
             new Field("int8", true, "is_deleted"),
@@ -37,6 +38,7 @@ public class BoardProducer {
 
     public FreeBoard send(String topic, FreeBoard board){
         Payload payload = Payload.builder()
+                .board_id(board.getBoardId())
                 .writer_id(board.getWriterId())
                 .count(board.getCount())
                 .count_of_answer(board.getCountOfAnswer())
