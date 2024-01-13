@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record FreeBoardAnswerResponseDto(
-        Long id,
+        String answerId,
         UserResponseDto writer,
         String contents,
         String updatedDate

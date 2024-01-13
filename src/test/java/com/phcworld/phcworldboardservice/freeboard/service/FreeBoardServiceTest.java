@@ -111,17 +111,17 @@ class FreeBoardServiceTest {
 
         String token = "token";
 
-        when(freeBoardService.getFreeBoard(1L, token)).thenReturn(map);
-        Map<String, Object> result = freeBoardService.getFreeBoard(1L, token);
+        when(freeBoardService.getFreeBoard(boardId, token)).thenReturn(map);
+        Map<String, Object> result = freeBoardService.getFreeBoard(boardId, token);
         assertThat(result).isEqualTo(map);
     }
 
     @Test
     void 게시글_하나_가져오기_없음(){
         String token = "token";
-        when(freeBoardService.getFreeBoard(1L, token)).thenThrow(NotFoundException.class);
+        when(freeBoardService.getFreeBoard(boardId, token)).thenThrow(NotFoundException.class);
         Assertions.assertThrows(NotFoundException.class, () -> {
-            freeBoardService.getFreeBoard(1L, token);
+            freeBoardService.getFreeBoard(boardId, token);
         });
     }
 

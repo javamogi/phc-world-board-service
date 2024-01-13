@@ -44,8 +44,11 @@ public class FreeBoardService {
 
 
 		String boardId = UUID.randomUUID().toString();
-		freeBoardRepository.findByBoardId(boardId)
-				.orElseThrow(DuplicationException::new);
+		boolean exist = freeBoardRepository.findByBoardId(boardId)
+				.isPresent();
+		if(exist){
+			throw new DuplicationException();
+		}
 		FreeBoard freeBoard = FreeBoard.builder()
 				.boardId(boardId)
 				.writerId(userId)
@@ -121,8 +124,8 @@ public class FreeBoardService {
 	}
 
 	@Transactional
-	public Map<String, Object> getFreeBoard(Long id, String token) {
-		FreeBoard freeBoard = freeBoardRepository.findById(id)
+	public Map<String, Object> getFreeBoard(String boardId, String token) {
+		FreeBoard freeBoard = freeBoardRepository.findByBoardId(boardId)
 				.orElseThrow(NotFoundException::new);
 		if(freeBoard.getIsDeleted()){
 			throw new DeletedEntityException();
@@ -165,7 +168,7 @@ public class FreeBoardService {
 				.get()
 				.uri(uriBuilder -> uriBuilder
 						.path("/freeboards/{id}")
-						.build(freeBoard.getId()))
+						.build(freeBoard.getBoardId()))
 				.header(HttpHeaders.AUTHORIZATION, token)
 				.retrieve()
 				.bodyToMono(new ParameterizedTypeReference<List<FreeBoardAnswerResponseDto>>() {})

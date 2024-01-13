@@ -35,7 +35,7 @@ public class FreeBoardApiController {
     }
 
     @GetMapping("/{freeBoardId}")
-    public ResponseEntity<Map<String, Object>> getFreeBoard(@PathVariable(name = "freeBoardId") Long freeBoardId,
+    public ResponseEntity<Map<String, Object>> getFreeBoard(@PathVariable(name = "freeBoardId") String freeBoardId,
                                                             HttpServletRequest request){
         String token = request.getHeader("Authorization");
         Map<String, Object> result = freeBoardService.getFreeBoard(freeBoardId, token);
