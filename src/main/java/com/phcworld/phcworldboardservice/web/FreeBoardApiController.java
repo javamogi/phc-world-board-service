@@ -49,13 +49,13 @@ public class FreeBoardApiController {
         return freeBoardService.updateFreeBoard(requestDto, token);
     }
 
-    @DeleteMapping("/{freeBoardId}")
-    public SuccessResponseDto deleteBoard(@PathVariable(name = "freeBoardId") Long freeBoardId){
-        return freeBoardService.deleteFreeBoard(freeBoardId);
+    @DeleteMapping("/{boardId}")
+    public SuccessResponseDto deleteBoard(@PathVariable(name = "boardId") String boardId){
+        return freeBoardService.deleteFreeBoard(boardId);
     }
 
-    @GetMapping("/{freeBoardId}/exist")
-    public boolean getExist(@PathVariable(name = "freeBoardId") Long freeBoardId){
-        return freeBoardService.existFreeBoard(freeBoardId);
+    @GetMapping("/{boardId}/exist")
+    public boolean getExist(@PathVariable(name = "boardId") String boardId){
+        return freeBoardService.existFreeBoard(boardId);
     }
 }

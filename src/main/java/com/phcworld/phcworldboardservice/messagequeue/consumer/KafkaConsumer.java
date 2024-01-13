@@ -1,4 +1,4 @@
-package com.phcworld.phcworldboardservice.messagequeue;
+package com.phcworld.phcworldboardservice.messagequeue.consumer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;

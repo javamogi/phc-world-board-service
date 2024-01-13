@@ -4,8 +4,10 @@ import com.phcworld.phcworldboardservice.domain.Authority;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
 import com.phcworld.phcworldboardservice.dto.*;
 import com.phcworld.phcworldboardservice.exception.model.DeletedEntityException;
+import com.phcworld.phcworldboardservice.exception.model.DuplicationException;
 import com.phcworld.phcworldboardservice.exception.model.NotFoundException;
 import com.phcworld.phcworldboardservice.exception.model.UnauthorizedException;
+import com.phcworld.phcworldboardservice.messagequeue.producer.BoardProducer;
 import com.phcworld.phcworldboardservice.repository.FreeBoardRepository;
 import com.phcworld.phcworldboardservice.security.utils.SecurityUtil;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +23,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -36,21 +35,27 @@ public class FreeBoardService {
 	private final Environment env;
 //	private final WebClient webClient;
 	private final WebClient.Builder webClient;
+	private final BoardProducer boardProducer;
 
-	@Transactional
 	public FreeBoardResponseDto registerFreeBoard(FreeBoardRequestDto request, String token) {
 		String userId = SecurityUtil.getCurrentMemberId();
 
 //		String contents = uploadFileService.registerImages(request.contents());
 
+
+		String boardId = UUID.randomUUID().toString();
+		freeBoardRepository.findByBoardId(boardId)
+				.orElseThrow(DuplicationException::new);
 		FreeBoard freeBoard = FreeBoard.builder()
+				.boardId(boardId)
 				.writerId(userId)
 				.title(request.title())
 //				.contents(contents)
 				.contents(request.contents())
 				.build();
 
-		freeBoardRepository.save(freeBoard);
+//		freeBoardRepository.save(freeBoard);
+		boardProducer.send("boards", freeBoard);
 
 		UserResponseDto user = webClient.build()
 //				.mutate().baseUrl("http://localhost:9634/users")
@@ -66,10 +71,13 @@ public class FreeBoardService {
 				.block();
 
 		return FreeBoardResponseDto.builder()
-				.id(freeBoard.getId())
+				.boardId(freeBoard.getBoardId())
 				.title(freeBoard.getTitle())
 				.contents(freeBoard.getContents())
 				.writer(user)
+				.isNew(freeBoard.isNew())
+				.count(freeBoard.getCount())
+				.countOfAnswer(freeBoard.getCountOfAnswer())
 				.build();
 	}
 
@@ -100,10 +108,13 @@ public class FreeBoardService {
 		return list.stream()
 				.map(f -> {
 					return FreeBoardResponseDto.builder()
-							.id(f.getId())
+							.boardId(f.getBoardId())
 							.title(f.getTitle())
 							.contents(f.getContents())
 							.writer(users.get(f.getWriterId()))
+							.isNew(f.isNew())
+							.count(f.getCount())
+							.countOfAnswer(f.getCountOfAnswer())
 							.build();
 				})
 				.toList();
@@ -161,10 +172,12 @@ public class FreeBoardService {
 				.block();
 
 		FreeBoardResponseDto response = FreeBoardResponseDto.builder()
-				.id(freeBoard.getId())
+				.boardId(freeBoard.getBoardId())
 				.title(freeBoard.getTitle())
 				.contents(freeBoard.getContents())
 				.writer(user)
+				.isNew(freeBoard.isNew())
+				.count(freeBoard.getCount())
 				.answers(answers)
 				.build();
 		map.put("freeboard", response);
@@ -206,16 +219,19 @@ public class FreeBoardService {
 				.block();
 
 		return FreeBoardResponseDto.builder()
-				.id(freeBoard.getId())
+				.boardId(freeBoard.getBoardId())
 				.title(freeBoard.getTitle())
 				.contents(freeBoard.getContents())
 				.writer(user)
+				.isNew(freeBoard.isNew())
+				.count(freeBoard.getCount())
+				.countOfAnswer(freeBoard.getCountOfAnswer())
 				.build();
 	}
 
 	@Transactional
-	public SuccessResponseDto deleteFreeBoard(Long id) {
-		FreeBoard freeBoard = freeBoardRepository.findById(id)
+	public SuccessResponseDto deleteFreeBoard(String boardId) {
+		FreeBoard freeBoard = freeBoardRepository.findByBoardId(boardId)
 				.orElseThrow(NotFoundException::new);
 		if(freeBoard.getIsDeleted()){
 			throw new DeletedEntityException();
@@ -235,8 +251,8 @@ public class FreeBoardService {
 				.build();
 	}
 
-	public boolean existFreeBoard(Long id){
-		return freeBoardRepository.findById(id)
+	public boolean existFreeBoard(String boardId){
+		return freeBoardRepository.findByBoardId(boardId)
 				.isPresent();
 	}
 

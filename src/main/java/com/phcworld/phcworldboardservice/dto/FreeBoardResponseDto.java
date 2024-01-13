@@ -8,7 +8,7 @@ import java.util.List;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record FreeBoardResponseDto(
-        Long id,
+        String boardId,
         UserResponseDto writer,
         String title,
         String contents,

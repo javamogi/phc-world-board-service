@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class FreeBoardSelectDto {
 
-    private Long id;
+    private String boardId;
     private String writerId;
     private String title;
     private String contents;

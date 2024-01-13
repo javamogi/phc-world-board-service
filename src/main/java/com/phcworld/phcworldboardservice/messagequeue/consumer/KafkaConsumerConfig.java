@@ -1,4 +1,4 @@
-package com.phcworld.phcworldboardservice.messagequeue;
+package com.phcworld.phcworldboardservice.messagequeue.consumer;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;

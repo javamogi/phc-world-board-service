@@ -11,10 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -27,16 +24,18 @@ class FreeBoardServiceTest {
 
     private static UserResponseDto user;
 
+    private static String boardId;
+
     @BeforeAll
     static void 회원_초기화(){
         user = UserResponseDto.builder()
-                .id(1L)
                 .email("test@test.test")
                 .name("테스트")
                 .profileImage("blank-profile-picture.png")
                 .createDate("방금전")
                 .userId("a2240b59-47f6-4ad4-ba07-f7c495909f40")
                 .build();
+        boardId = UUID.randomUUID().toString();
     }
 
     @Test
@@ -47,10 +46,10 @@ class FreeBoardServiceTest {
                 .build();
 
         FreeBoardResponseDto response = FreeBoardResponseDto.builder()
-                .id(1L)
                 .title(request.title())
                 .contents(request.contents())
                 .writer(user)
+                .boardId(boardId)
                 .build();
         String token = "token";
 
@@ -69,17 +68,18 @@ class FreeBoardServiceTest {
                 .build();
 
         FreeBoardResponseDto freeBoardResponse = FreeBoardResponseDto.builder()
-                .id(1L)
                 .title("테스트")
                 .contents("테스트 내용")
                 .writer(user)
+                .boardId(boardId)
                 .build();
 
+        String boardId2 = UUID.randomUUID().toString();
         FreeBoardResponseDto freeBoardResponse2 = FreeBoardResponseDto.builder()
-                .id(2L)
                 .title("테스트2")
                 .contents("테스트 내용2")
                 .writer(user)
+                .boardId(boardId2)
                 .build();
         List<FreeBoardResponseDto> list = new ArrayList<>();
         list.add(freeBoardResponse);
@@ -97,7 +97,7 @@ class FreeBoardServiceTest {
     void 게시글_하나_가져오기(){
         Map<String, Object> map = new HashMap<>();
         FreeBoardResponseDto responseDto = FreeBoardResponseDto.builder()
-                .id(1L)
+                .boardId(boardId)
                 .writer(user)
                 .title("title")
                 .contents("contents")
@@ -133,7 +133,7 @@ class FreeBoardServiceTest {
                 .contents("contents")
                 .build();
         FreeBoardResponseDto responseDto = FreeBoardResponseDto.builder()
-                .id(1L)
+                .boardId(boardId)
                 .writer(user)
                 .title("title")
                 .contents("contents")
@@ -171,31 +171,32 @@ class FreeBoardServiceTest {
                 .message("삭제 성공")
                 .build();
 
-        when(freeBoardService.deleteFreeBoard(1L)).thenReturn(responseDto);
-        SuccessResponseDto response = freeBoardService.deleteFreeBoard(1L);
+        when(freeBoardService.deleteFreeBoard(boardId)).thenReturn(responseDto);
+        SuccessResponseDto response = freeBoardService.deleteFreeBoard(boardId);
         assertThat(responseDto).isEqualTo(response);
     }
 
     @Test
     void 게시글_삭제_실패_게시글_없음(){
-        when(freeBoardService.deleteFreeBoard(100L)).thenThrow(NotFoundException.class);
+        String tmpId = UUID.randomUUID().toString();
+        when(freeBoardService.deleteFreeBoard(tmpId)).thenThrow(NotFoundException.class);
         Assertions.assertThrows(NotFoundException.class, () -> {
-            freeBoardService.deleteFreeBoard(100L);
+            freeBoardService.deleteFreeBoard(tmpId);
         });
     }
 
     @Test
     void 게시글_삭제_실패_권한_없음(){
-        when(freeBoardService.deleteFreeBoard(1L)).thenThrow(UnauthorizedException.class);
+        when(freeBoardService.deleteFreeBoard(boardId)).thenThrow(UnauthorizedException.class);
         Assertions.assertThrows(UnauthorizedException.class, () -> {
-            freeBoardService.deleteFreeBoard(1L);
+            freeBoardService.deleteFreeBoard(boardId);
         });
     }
 
     @Test
     void 게시글_존재_확인(){
-        when(freeBoardService.existFreeBoard(1L)).thenReturn(false);
-        boolean result = freeBoardService.existFreeBoard(1L);
+        when(freeBoardService.existFreeBoard(boardId)).thenReturn(false);
+        boolean result = freeBoardService.existFreeBoard(boardId);
         assertThat(result).isFalse();
     }
 }

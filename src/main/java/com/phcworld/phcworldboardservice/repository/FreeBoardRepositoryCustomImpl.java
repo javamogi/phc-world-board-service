@@ -46,12 +46,13 @@ public class FreeBoardRepositoryCustomImpl implements FreeBoardRepositoryCustom 
 
         return queryFactory
                 .select(Projections.fields(FreeBoardSelectDto.class,
-                        freeBoard.id,
+                        freeBoard.boardId,
                         freeBoard.writerId,
                         freeBoard.title,
                         freeBoard.contents,
                         freeBoard.createDate,
                         freeBoard.updateDate,
+                        freeBoard.countOfAnswer,
                         freeBoard.count))
 //                        ExpressionUtils.as(
 //                                JPAExpressions

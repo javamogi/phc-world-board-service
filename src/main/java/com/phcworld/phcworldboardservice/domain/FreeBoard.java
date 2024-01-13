@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @DynamicUpdate
 @DynamicInsert
-@Table(name = "free_board",
+@Table(name = "boards",
 		indexes = {@Index(name = "idx__create_date", columnList = "createDate"),
 				@Index(name = "idx__writer_id_create_date", columnList = "writer_id, createDate")})
 //@SequenceGenerator(
@@ -41,8 +41,13 @@ public class FreeBoard {
 //	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "BOARD_SEQ_GENERATOR")
 	private Long id;
 
+	@Column(nullable = false, unique = true)
+	private String boardId;
+
+	@Column(nullable = false)
 	private String writerId;
 
+	@Column(nullable = false)
 	private String title;
 
 	@Lob
