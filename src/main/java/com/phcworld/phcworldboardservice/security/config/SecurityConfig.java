@@ -70,8 +70,9 @@ public class SecurityConfig {
                 .authorizeRequests((authorizeRequestsConfig) ->
                         authorizeRequestsConfig
 //                                .requestMatchers(antMatcher(HttpMethod.GET, "/freeboards")).permitAll()
-                                .requestMatchers("/**")
-                                .hasIpAddress(env.getProperty("gateway.ip"))
+                                .requestMatchers("/**").permitAll()
+//                                .requestMatchers("/**")
+//                                .hasIpAddress(env.getProperty("gateway.ip"))
                                 .anyRequest().authenticated()
                 )
                 // enable h2-console

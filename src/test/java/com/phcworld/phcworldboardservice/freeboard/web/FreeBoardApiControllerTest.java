@@ -33,7 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Slf4j
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
 @Disabled("Disabled when build")
 class FreeBoardApiControllerTest {
 
@@ -62,6 +61,7 @@ class FreeBoardApiControllerTest {
         token = "Bearer " + accessToken;
     }
 
+    @Disabled("kafka 서버가 기동 되었을 때만 가능")
     @Test
     void 게시글_등록_성공() throws Exception {
         FreeBoardRequestDto requestDto = FreeBoardRequestDto.builder()
@@ -79,6 +79,7 @@ class FreeBoardApiControllerTest {
                 .andExpect(status().isCreated());
     }
 
+    @Disabled("kafka 서버가 기동 되었을 때만 가능")
     @Test
     void 게시글_등록_성공_이미지_첨부() throws Exception {
 //        String contents = FileConvertUtils.getFileData("blank-profile-picture.png");
@@ -118,7 +119,7 @@ class FreeBoardApiControllerTest {
     @Test
     void 게시글_하나_조회() throws Exception {
 
-        this.mvc.perform(get("/freeboards/{freeBoardId}", 1L)
+        this.mvc.perform(get("/freeboards/{freeBoardId}", "1111")
                         .header("Authorization", token)
                         .with(csrf()))
                 .andDo(print())
@@ -127,7 +128,7 @@ class FreeBoardApiControllerTest {
 
     @Test
     void 게시글_하나_조회_데이터_없음() throws Exception {
-        this.mvc.perform(get("/freeboards/{freeBoardId}", 999L)
+        this.mvc.perform(get("/freeboards/{freeBoardId}", "9999")
                         .header("Authorization", token)
                         .with(csrf()))
                 .andDo(print())
@@ -135,6 +136,7 @@ class FreeBoardApiControllerTest {
     }
 
     @Test
+    @Transactional
     void 게시글_수정_성공() throws Exception {
 //        String contents = FileConvertUtils.getFileData("blank-profile-picture.png");
 //        contents = "<p><img src=\"" + contents + "\"></p>";
@@ -183,8 +185,9 @@ class FreeBoardApiControllerTest {
     }
 
     @Test
+    @Transactional
     void 게시글_삭제_성공() throws Exception {
-        this.mvc.perform(delete("/freeboards/{freeBoardId}", 1L)
+        this.mvc.perform(delete("/freeboards/{freeBoardId}", "1111")
                         .header("Authorization", token)
                         .with(csrf()))
                 .andDo(print())
@@ -202,7 +205,7 @@ class FreeBoardApiControllerTest {
         long now = (new Date()).getTime();
         String accessToken = "Bearer " + tokenProvider.generateAccessToken(authentication, now);
 
-        this.mvc.perform(delete("/freeboards/{freeBoardId}", 1L)
+        this.mvc.perform(delete("/freeboards/{freeBoardId}", "1111")
                         .header("Authorization", accessToken)
                         .with(csrf()))
                 .andDo(print())
