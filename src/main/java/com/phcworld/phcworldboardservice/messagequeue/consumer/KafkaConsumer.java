@@ -34,8 +34,8 @@ public class KafkaConsumer {
             e.printStackTrace();
         }
 
-        Integer boardId = (Integer) map.get("freeBoardId");
-        FreeBoard entity = repository.findById(boardId.longValue())
+        String boardId = (String) map.get("freeBoardId");
+        FreeBoard entity = repository.findByBoardId(boardId)
                 .orElseThrow(NotFoundException::new);
         entity.addCountOfAnswer();
     }
