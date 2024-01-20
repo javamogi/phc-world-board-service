@@ -53,10 +53,10 @@ public class FreeBoard {
 	@Lob
 	private String contents;
 
-	@CreatedDate
+	@Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP()")
 	private LocalDateTime createDate;
-	
-	@LastModifiedDate
+
+	@Column(nullable = false)
 	private LocalDateTime updateDate;
 
 	@ColumnDefault("0")
@@ -64,6 +64,7 @@ public class FreeBoard {
 	private Integer count = 0;
 
 	@ColumnDefault("false")
+	@Column(nullable = false)
 	private Boolean isDeleted;
 
 	@ColumnDefault("0")
@@ -108,10 +109,4 @@ public class FreeBoard {
 		this.countOfAnswer++;
 	}
 
-//	public List<FreeBoardAnswer> getFreeBoardAnswers() {
-//		if(freeBoardAnswers == null){
-//			return new ArrayList<>();
-//		}
-//		return freeBoardAnswers;
-//	}
 }

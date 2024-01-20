@@ -16,8 +16,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,11 +28,9 @@ import java.util.UUID;
 public class FreeBoardService {
 	private final FreeBoardRepository freeBoardRepository;
 //	private final UploadFileService uploadFileService;
-	private final RestTemplate restTemplate;
+//	private final RestTemplate restTemplate;
 //	private final WebClient webClient;
-	private final WebClient.Builder webClient;
 	private final BoardProducer boardProducer;
-//	private final CircuitBreakerFactory circuitBreakerFactory;
 	private final WebclientService webclientService;
 
 	public FreeBoardResponseDto registerFreeBoard(FreeBoardRequestDto request, String token) {
@@ -148,7 +144,6 @@ public class FreeBoardService {
 		return map;
 	}
 
-	@Transactional
 	public FreeBoardResponseDto updateFreeBoard(FreeBoardRequestDto request, String token) {
 		FreeBoard freeBoard = freeBoardRepository.findById(request.id())
 				.orElseThrow(NotFoundException::new);
@@ -166,6 +161,7 @@ public class FreeBoardService {
 
 //		freeBoard.update(request.title(), contents);
 		freeBoard.update(request.title(), request.contents());
+		boardProducer.send("boards", freeBoard);
 
 		UserResponseDto user = webclientService.getUserResponseDto(token, freeBoard);
 
@@ -180,7 +176,6 @@ public class FreeBoardService {
 				.build();
 	}
 
-	@Transactional
 	public SuccessResponseDto deleteFreeBoard(String boardId) {
 		FreeBoard freeBoard = freeBoardRepository.findByBoardId(boardId)
 				.orElseThrow(NotFoundException::new);
@@ -195,6 +190,7 @@ public class FreeBoardService {
 		}
 
 		freeBoard.delete();
+		boardProducer.send("boards", freeBoard);
 
 		return SuccessResponseDto.builder()
 				.statusCode(200)

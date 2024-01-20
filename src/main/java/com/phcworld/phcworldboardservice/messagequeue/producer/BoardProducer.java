@@ -8,7 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,15 +22,12 @@ public class BoardProducer {
     private final ObjectMapper mapper;
 
     List<Field> fields = Arrays.asList(
-            new Field("string", true, "board_id"),
-            new Field("int32", false, "count"),
-            new Field("int32", false, "count_of_answer"),
-            new Field("int8", true, "is_deleted"),
-            new Field("int64", true, "create_date"){public String name="org.apache.kafka.connect.data.Timestamp"; public int version = 1;},
-            new Field("int64", true, "update_date"){public String name="org.apache.kafka.connect.data.Timestamp"; public int version = 1;},
+            new Field("string", false, "board_id"),
+            new Field("int8", false, "is_deleted"),
+            new Field("string", false, "update_date"),
             new Field("string", true, "title"),
             new Field("string", true, "contents"),
-            new Field("string", true, "writer_id"));
+            new Field("string", false, "writer_id"));
     Schema schema = Schema.builder()
             .type("struct")
             .fields(fields)
@@ -40,13 +39,10 @@ public class BoardProducer {
         Payload payload = Payload.builder()
                 .board_id(board.getBoardId())
                 .writer_id(board.getWriterId())
-                .count(board.getCount())
-                .count_of_answer(board.getCountOfAnswer())
-                .is_deleted(0)
+                .is_deleted((byte)(Boolean.TRUE.equals(board.getIsDeleted()) ? 1 : 0))
                 .title(board.getTitle())
                 .contents(board.getContents())
-                .create_date(System.currentTimeMillis())
-                .update_date(System.currentTimeMillis())
+                .update_date(LocalDateTime.now().withNano(0).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")))
                 .build();
 
         KafkaBoardDto kafkaBoardDto = KafkaBoardDto.builder()
