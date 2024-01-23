@@ -34,8 +34,8 @@ public class WebclientService {
 
         UserResponseDto user = circuitBreaker.run(
                 () -> webClient.build()
-                        .mutate().baseUrl("http://localhost:8080/users")
-//				.mutate().baseUrl(env.getProperty("user_service.url"))
+//                        .mutate().baseUrl("http://localhost:8080/users")
+				        .mutate().baseUrl(env.getProperty("user_service.url"))
                         .build()
                         .get()
                         .uri(uriBuilder -> uriBuilder
@@ -62,8 +62,8 @@ public class WebclientService {
         CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
         Map<String, UserResponseDto> users = circuitBreaker.run(
                 () -> webClient.build()
-                        .mutate().baseUrl("http://localhost:8080/users")
-//				.mutate().baseUrl(env.getProperty("user_service.url"))
+//                        .mutate().baseUrl("http://localhost:8080/users")
+				        .mutate().baseUrl(env.getProperty("user_service.url"))
                         .build()
                         .get()
                         .uri(uriBuilder -> uriBuilder
@@ -86,7 +86,7 @@ public class WebclientService {
         List<FreeBoardAnswerResponseDto> answers = circuitBreaker.run(
                 () -> webClient.build()
                         .mutate().baseUrl("http://localhost:8080/answers")
-//				.mutate().baseUrl(env.getProperty("answer_service.url"))
+//				        .mutate().baseUrl(env.getProperty("answer_service.url"))
                         .build()
                         .get()
                         .uri(uriBuilder -> uriBuilder

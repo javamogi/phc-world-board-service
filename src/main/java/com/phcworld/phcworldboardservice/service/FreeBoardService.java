@@ -29,7 +29,6 @@ public class FreeBoardService {
 	private final FreeBoardRepository freeBoardRepository;
 //	private final UploadFileService uploadFileService;
 //	private final RestTemplate restTemplate;
-//	private final WebClient webClient;
 	private final BoardProducer boardProducer;
 	private final WebclientService webclientService;
 

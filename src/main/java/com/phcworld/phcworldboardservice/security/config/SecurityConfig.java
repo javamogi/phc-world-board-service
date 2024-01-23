@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -19,8 +18,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -41,7 +38,7 @@ public class SecurityConfig {
     // h2, css, js 무시
     @Bean
     public WebSecurityCustomizer configure(){
-        return (web) -> web.ignoring()
+        return web -> web.ignoring()
                 .requestMatchers(
                         /* swagger v2 */
                         "/v2/api-docs",
@@ -66,8 +63,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         return http
-                .csrf((csrfConfig) -> csrfConfig.disable())
-                .authorizeRequests((authorizeRequestsConfig) ->
+                .csrf(csrfConfig -> csrfConfig.disable())
+                .authorizeHttpRequests(authorizeRequestsConfig ->
                         authorizeRequestsConfig
 //                                .requestMatchers(antMatcher(HttpMethod.GET, "/freeboards")).permitAll()
                                 .requestMatchers("/**").permitAll()
@@ -76,17 +73,17 @@ public class SecurityConfig {
                                 .anyRequest().authenticated()
                 )
                 // enable h2-console
-                .headers((headers)->
+                .headers(headers->
                         headers.contentTypeOptions(contentTypeOptionsConfig ->
                                 headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)))
-                .exceptionHandling((exceptionConfig) ->
+                .exceptionHandling(exceptionConfig ->
                         exceptionConfig
                                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                                 .accessDeniedHandler(jwtAccessDeniedHandler))
 
                 // 시큐리티는 기본적으로 세션을 사용
                 // 여기서는 세션을 사용하지 않기 때문에 세션 설정을 Stateless 로 설정
-                .sessionManagement((sessionManagementConfig) -> sessionManagementConfig.
+                .sessionManagement(sessionManagementConfig -> sessionManagementConfig.
                         sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .with(new JwtSecurityConfig(tokenProvider, jwtExceptionFilter), Customizer.withDefaults())
                 .build();
