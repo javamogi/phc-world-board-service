@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfig {
     @Bean
     public GroupedOpenApi customTestOpenAPi() {
-        String[] paths = {"/boards/**"};
+        String[] paths = {"/freeboards/**"};
 
         return GroupedOpenApi
                 .builder()

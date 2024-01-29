@@ -24,7 +24,7 @@ public class KafkaConsumer {
 
     @KafkaListener(topics = "board-topic")
     @Transactional
-    public void updateQty(String kafkaMessage){
+    public void updateCountOfAnswer(String kafkaMessage){
         log.info("kafka message : -> {}", kafkaMessage);
 
         Map<Object, Object> map = new HashMap<>();
