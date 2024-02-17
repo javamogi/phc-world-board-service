@@ -38,18 +38,12 @@ public class FreeBoardService {
 //		String contents = uploadFileService.registerImages(request.contents());
 
 		String boardId = UUID.randomUUID().toString();
-		boolean exist = freeBoardRepository.findByBoardId(boardId)
-				.isPresent();
-		if(exist){
-			throw new DuplicationException();
-		}
-		FreeBoard freeBoard = FreeBoard.builder()
-				.boardId(boardId)
-				.writerId(userId)
-				.title(request.title())
-//				.contents(contents)
-				.contents(request.contents())
-				.build();
+		freeBoardRepository.findByBoardId(boardId)
+				.ifPresent(f -> {
+					throw new DuplicationException();
+				});
+
+		FreeBoard freeBoard = request.toEntity(boardId, userId);
 
 //		freeBoardRepository.save(freeBoard);
 		boardProducer.send("boards", freeBoard);
@@ -146,9 +140,11 @@ public class FreeBoardService {
 	public FreeBoardResponseDto updateFreeBoard(FreeBoardRequestDto request, String token) {
 		FreeBoard freeBoard = freeBoardRepository.findById(request.id())
 				.orElseThrow(NotFoundException::new);
+
 		if(freeBoard.getIsDeleted()){
 			throw new DeletedEntityException();
 		}
+
 		String userId = SecurityUtil.getCurrentMemberId();
 		Authority authorities = SecurityUtil.getAuthorities();
 
@@ -176,20 +172,24 @@ public class FreeBoardService {
 	}
 
 	public SuccessResponseDto deleteFreeBoard(String boardId) {
-		FreeBoard freeBoard = freeBoardRepository.findByBoardId(boardId)
-				.orElseThrow(NotFoundException::new);
-		if(freeBoard.getIsDeleted()){
-			throw new DeletedEntityException();
-		}
 		String userId = SecurityUtil.getCurrentMemberId();
 		Authority authorities = SecurityUtil.getAuthorities();
-
-		if(freeBoard.matchUser(userId) && authorities != Authority.ROLE_ADMIN){
-			throw new UnauthorizedException();
-		}
-
-		freeBoard.delete();
-		boardProducer.send("boards", freeBoard);
+		freeBoardRepository.findByBoardId(boardId)
+				.ifPresentOrElse(
+						f -> {
+							if(f.getIsDeleted()){
+								throw new DeletedEntityException();
+							}
+							if(f.matchUser(userId) && authorities != Authority.ROLE_ADMIN){
+								throw new UnauthorizedException();
+							}
+							f.delete();
+							boardProducer.send("boards", f);
+						},
+						() -> {
+							throw new NotFoundException();
+						}
+				);
 
 		return SuccessResponseDto.builder()
 				.statusCode(200)
