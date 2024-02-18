@@ -38,10 +38,9 @@ public class FreeBoardService {
 //		String contents = uploadFileService.registerImages(request.contents());
 
 		String boardId = UUID.randomUUID().toString();
-		freeBoardRepository.findByBoardId(boardId)
-				.ifPresent(f -> {
-					throw new DuplicationException();
-				});
+		while(freeBoardRepository.findByBoardId(boardId).isPresent()){
+			boardId = UUID.randomUUID().toString();
+		}
 
 		FreeBoard freeBoard = request.toEntity(boardId, userId);
 
@@ -50,15 +49,7 @@ public class FreeBoardService {
 
 		UserResponseDto user = webclientService.getUserResponseDto(token, freeBoard);
 
-		return FreeBoardResponseDto.builder()
-				.boardId(freeBoard.getBoardId())
-				.title(freeBoard.getTitle())
-				.contents(freeBoard.getContents())
-				.writer(user)
-				.isNew(freeBoard.isNew())
-				.count(freeBoard.getCount())
-				.countOfAnswer(freeBoard.getCountOfAnswer())
-				.build();
+		return FreeBoardResponseDto.of(user, freeBoard);
 	}
 
 	@Transactional(readOnly = true)
