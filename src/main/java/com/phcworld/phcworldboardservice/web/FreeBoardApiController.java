@@ -44,11 +44,12 @@ public class FreeBoardApiController {
             @ApiResponse(responseCode = "409", description = "삭제된 게시글")
     })
     @GetMapping("/{freeBoardId}")
-    public ResponseEntity<Map<String, Object>> getFreeBoard(@PathVariable(name = "freeBoardId") String freeBoardId,
+    public FreeBoardResponseDto getFreeBoard(@PathVariable(name = "freeBoardId") String freeBoardId,
                                                             HttpServletRequest request){
         String token = request.getHeader("Authorization");
-        Map<String, Object> result = freeBoardService.getFreeBoard(freeBoardId, token);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        FreeBoardResponseDto result = freeBoardService.getFreeBoard(freeBoardId, token);
+//        return new ResponseEntity<>(result, HttpStatus.OK);
+        return result;
     }
 
     @ApiResponses(value = {

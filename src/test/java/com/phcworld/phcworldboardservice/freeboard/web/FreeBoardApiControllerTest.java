@@ -42,7 +42,6 @@ class FreeBoardApiControllerTest {
     @SpyBean
     private TokenProvider tokenProvider;
 
-
     @Autowired
     private ObjectMapper objectMapper;
 

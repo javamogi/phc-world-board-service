@@ -17,7 +17,9 @@ public record FreeBoardResponseDto(
         Integer count,
         Integer countOfAnswer,
         Boolean isNew,
-        List<FreeBoardAnswerResponseDto> answers
+        List<FreeBoardAnswerResponseDto> answers,
+        Boolean isDeleteAuthority,
+        Boolean isModifyAuthority
 ) {
     public static FreeBoardResponseDto of(UserResponseDto user, FreeBoard freeBoard){
         return FreeBoardResponseDto.builder()
@@ -30,4 +32,5 @@ public record FreeBoardResponseDto(
                 .countOfAnswer(freeBoard.getCountOfAnswer())
                 .build();
     }
+
 }

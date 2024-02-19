@@ -95,7 +95,6 @@ class FreeBoardServiceTest {
 
     @Test
     void 게시글_하나_가져오기(){
-        Map<String, Object> map = new HashMap<>();
         FreeBoardResponseDto responseDto = FreeBoardResponseDto.builder()
                 .boardId(boardId)
                 .writer(user)
@@ -104,16 +103,15 @@ class FreeBoardServiceTest {
                 .createDate("방금전")
                 .count(1)
                 .isNew(true)
+                .isDeleteAuthority(false)
+                .isModifyAuthority(false)
                 .build();
-        map.put("freeboard", responseDto);
-        map.put("isDeletedAuthrity", false);
-        map.put("isModifyAuthrity", false);
 
         String token = "token";
 
-        when(freeBoardService.getFreeBoard(boardId, token)).thenReturn(map);
-        Map<String, Object> result = freeBoardService.getFreeBoard(boardId, token);
-        assertThat(result).isEqualTo(map);
+        when(freeBoardService.getFreeBoard(boardId, token)).thenReturn(responseDto);
+        FreeBoardResponseDto result = freeBoardService.getFreeBoard(boardId, token);
+        assertThat(result).isEqualTo(responseDto);
     }
 
     @Test

@@ -87,7 +87,7 @@ public class FreeBoardService {
 	}
 
 	@Transactional
-	public Map<String, Object> getFreeBoard(String boardId, String token) {
+	public FreeBoardResponseDto getFreeBoard(String boardId, String token) {
 		FreeBoard freeBoard = freeBoardRepository.findByBoardId(boardId)
 				.orElseThrow(NotFoundException::new);
 		if(freeBoard.getIsDeleted()){
@@ -108,12 +108,10 @@ public class FreeBoardService {
 
 		freeBoard.addCount();
 
-		Map<String, Object> map = new HashMap<>();
-
 		UserResponseDto user = webclientService.getUserResponseDto(token, freeBoard);
 		List<FreeBoardAnswerResponseDto> answers = webclientService.getFreeBoardAnswerResponseDtoList(token, freeBoard);
 
-		FreeBoardResponseDto response = FreeBoardResponseDto.builder()
+		return FreeBoardResponseDto.builder()
 				.boardId(freeBoard.getBoardId())
 				.title(freeBoard.getTitle())
 				.contents(freeBoard.getContents())
@@ -121,11 +119,9 @@ public class FreeBoardService {
 				.isNew(freeBoard.isNew())
 				.count(freeBoard.getCount())
 				.answers(answers)
+				.isDeleteAuthority(isDeleteAuthority)
+				.isModifyAuthority(isModifyAuthority)
 				.build();
-		map.put("freeboard", response);
-		map.put("isDeleteAuthority", isDeleteAuthority);
-		map.put("isModifyAuthority", isModifyAuthority);
-		return map;
 	}
 
 	public FreeBoardResponseDto updateFreeBoard(FreeBoardRequestDto request, String token) {
