@@ -85,8 +85,8 @@ public class WebclientService {
         CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
         List<FreeBoardAnswerResponseDto> answers = circuitBreaker.run(
                 () -> webClient.build()
-                        .mutate().baseUrl("http://localhost:8080/answers")
-//				        .mutate().baseUrl(env.getProperty("answer_service.url"))
+//                        .mutate().baseUrl("http://localhost:8080/answers")
+				        .mutate().baseUrl(env.getProperty("answer_service.url"))
                         .build()
                         .get()
                         .uri(uriBuilder -> uriBuilder
