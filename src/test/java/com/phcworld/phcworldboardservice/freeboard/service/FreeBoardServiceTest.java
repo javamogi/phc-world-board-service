@@ -126,7 +126,7 @@ class FreeBoardServiceTest {
     @Test
     void 게시글_수정(){
         FreeBoardRequestDto request = FreeBoardRequestDto.builder()
-                .id(1L)
+                .id("1111")
                 .title("title")
                 .contents("contents")
                 .build();
@@ -150,7 +150,7 @@ class FreeBoardServiceTest {
     @Test
     void 게시글_수정_게시글_없음(){
         FreeBoardRequestDto request = FreeBoardRequestDto.builder()
-                .id(1L)
+                .id("1111")
                 .title("title")
                 .contents("contents")
                 .build();

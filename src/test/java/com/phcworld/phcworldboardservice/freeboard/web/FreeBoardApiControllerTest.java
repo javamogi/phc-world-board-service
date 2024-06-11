@@ -140,7 +140,7 @@ class FreeBoardApiControllerTest {
 //        String contents = FileConvertUtils.getFileData("blank-profile-picture.png");
 //        contents = "<p><img src=\"" + contents + "\"></p>";
         FreeBoardRequestDto requestDto = FreeBoardRequestDto.builder()
-                .id(1L)
+                .id("1L")
                 .title("제목")
 //                .contents(contents)
                 .contents("update contents")
@@ -159,7 +159,7 @@ class FreeBoardApiControllerTest {
     @Test
     void 게시글_수정_실패_권한_없음() throws Exception {
         FreeBoardRequestDto requestDto = FreeBoardRequestDto.builder()
-                .id(1L)
+                .id("1L")
                 .title("제목")
                 .contents("내용")
                 .build();

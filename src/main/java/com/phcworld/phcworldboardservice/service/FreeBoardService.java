@@ -125,7 +125,10 @@ public class FreeBoardService {
 	}
 
 	public FreeBoardResponseDto updateFreeBoard(FreeBoardRequestDto request, String token) {
-		FreeBoard freeBoard = freeBoardRepository.findById(request.id())
+//		FreeBoard freeBoard = freeBoardRepository.findById(request.id())
+//				.orElseThrow(NotFoundException::new);
+
+		FreeBoard freeBoard = freeBoardRepository.findByBoardId(request.id())
 				.orElseThrow(NotFoundException::new);
 
 		if(freeBoard.getIsDeleted()){
