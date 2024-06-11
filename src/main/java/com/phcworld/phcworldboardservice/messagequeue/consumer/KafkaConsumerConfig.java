@@ -2,6 +2,7 @@ package com.phcworld.phcworldboardservice.messagequeue.consumer;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -16,10 +17,14 @@ import java.util.Map;
 @Configuration
 public class KafkaConsumerConfig {
 
+    @Value("${kafka.broker.url}")
+    private String url;
+
     @Bean
     public ConsumerFactory<String, String> consumerFactory(){
         Map<String, Object> properties = new HashMap<>();
-        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
+//        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
+        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, url);
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, "consumerGroup");
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
