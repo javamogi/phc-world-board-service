@@ -1,8 +1,8 @@
 package com.phcworld.phcworldboardservice.service;
 
-import com.phcworld.phcworldboardservice.domain.FreeBoard;
-import com.phcworld.phcworldboardservice.dto.FreeBoardAnswerResponseDto;
-import com.phcworld.phcworldboardservice.dto.UserResponseDto;
+import com.phcworld.phcworldboardservice.infrastructure.FreeBoardEntity;
+import com.phcworld.phcworldboardservice.infrastructure.port.FreeBoardAnswerResponse;
+import com.phcworld.phcworldboardservice.service.port.UserResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
@@ -27,12 +27,12 @@ public class WebclientService {
     private final Environment env;
     private final CircuitBreakerFactory circuitBreakerFactory;
 
-    public UserResponseDto getUserResponseDto(String token, FreeBoard freeBoard) {
+    public UserResponse getUserResponseDto(String token, FreeBoardEntity freeBoardEntity) {
 
         log.info("Before call users microservice");
         CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
 
-        UserResponseDto user = circuitBreaker.run(
+        UserResponse user = circuitBreaker.run(
                 () -> webClient.build()
 //                        .mutate().baseUrl("http://localhost:8080/users")
 				        .mutate().baseUrl(env.getProperty("user_service.url"))
@@ -40,12 +40,12 @@ public class WebclientService {
                         .get()
                         .uri(uriBuilder -> uriBuilder
                                 .path("/{id}")
-                                .build(freeBoard.getWriterId()))
+                                .build(freeBoardEntity.getWriterId()))
                         .header(HttpHeaders.AUTHORIZATION, token)
                         .retrieve()
-                        .bodyToMono(UserResponseDto.class)
+                        .bodyToMono(UserResponse.class)
                         .block(),
-                throwable -> UserResponseDto.builder()
+                throwable -> UserResponse.builder()
                         .email("")
                         .name("")
                         .createDate("")
@@ -56,11 +56,11 @@ public class WebclientService {
         return user;
     }
 
-    public Map<String, UserResponseDto> getUserResponseDtoMap(String token, List<String> userIds) {
+    public Map<String, UserResponse> getUserResponseDtoMap(String token, List<String> userIds) {
 
         log.info("Before call users microservice");
         CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
-        Map<String, UserResponseDto> users = circuitBreaker.run(
+        Map<String, UserResponse> users = circuitBreaker.run(
                 () -> webClient.build()
 //                        .mutate().baseUrl("http://localhost:8080/users")
 				        .mutate().baseUrl(env.getProperty("user_service.url"))
@@ -72,18 +72,18 @@ public class WebclientService {
                                 .build())
                         .header(HttpHeaders.AUTHORIZATION, token)
                         .retrieve()
-                        .bodyToMono(new ParameterizedTypeReference<Map<String, UserResponseDto>>() {})
+                        .bodyToMono(new ParameterizedTypeReference<Map<String, UserResponse>>() {})
                         .block(),
                 throwable -> new HashMap<>());
         log.info("After called users microservice");
         return users;
     }
 
-    public List<FreeBoardAnswerResponseDto> getFreeBoardAnswerResponseDtoList(String token, FreeBoard freeBoard) {
+    public List<FreeBoardAnswerResponse> getFreeBoardAnswerResponseDtoList(String token, FreeBoardEntity freeBoardEntity) {
 
         log.info("Before call users microservice");
         CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
-        List<FreeBoardAnswerResponseDto> answers = circuitBreaker.run(
+        List<FreeBoardAnswerResponse> answers = circuitBreaker.run(
                 () -> webClient.build()
 //                        .mutate().baseUrl("http://localhost:8080/answers")
 				        .mutate().baseUrl(env.getProperty("answer_service.url"))
@@ -91,10 +91,10 @@ public class WebclientService {
                         .get()
                         .uri(uriBuilder -> uriBuilder
                                 .path("/freeboards/{id}")
-                                .build(freeBoard.getBoardId()))
+                                .build(freeBoardEntity.getBoardId()))
                         .header(HttpHeaders.AUTHORIZATION, token)
                         .retrieve()
-                        .bodyToMono(new ParameterizedTypeReference<List<FreeBoardAnswerResponseDto>>() {})
+                        .bodyToMono(new ParameterizedTypeReference<List<FreeBoardAnswerResponse>>() {})
                         .block(),
                 throwable -> new ArrayList<>());
         log.info("After called users microservice");

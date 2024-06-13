@@ -1,9 +1,13 @@
 package com.phcworld.phcworldboardservice.freeboard.service;
 
-import com.phcworld.phcworldboardservice.dto.*;
+import com.phcworld.phcworldboardservice.controller.port.FreeBoardResponse;
+import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearchDto;
+import com.phcworld.phcworldboardservice.controller.port.SuccessResponse;
+import com.phcworld.phcworldboardservice.domain.port.FreeBoardRequestDto;
 import com.phcworld.phcworldboardservice.exception.model.NotFoundException;
 import com.phcworld.phcworldboardservice.exception.model.UnauthorizedException;
 import com.phcworld.phcworldboardservice.service.FreeBoardService;
+import com.phcworld.phcworldboardservice.service.port.UserResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -17,18 +21,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class FreeBoardServiceTest {
+class FreeBoardEntityServiceTest {
 
     @Mock
     private FreeBoardService freeBoardService;
 
-    private static UserResponseDto user;
+    private static UserResponse user;
 
     private static String boardId;
 
     @BeforeAll
     static void 회원_초기화(){
-        user = UserResponseDto.builder()
+        user = UserResponse.builder()
                 .email("test@test.test")
                 .name("테스트")
                 .profileImage("blank-profile-picture.png")
@@ -45,7 +49,7 @@ class FreeBoardServiceTest {
                 .contents("contents")
                 .build();
 
-        FreeBoardResponseDto response = FreeBoardResponseDto.builder()
+        FreeBoardResponse response = FreeBoardResponse.builder()
                 .title(request.title())
                 .contents(request.contents())
                 .writer(user)
@@ -54,7 +58,7 @@ class FreeBoardServiceTest {
         String token = "token";
 
         when(freeBoardService.registerFreeBoard(request,token)).thenReturn(response);
-        FreeBoardResponseDto successResponse = freeBoardService.registerFreeBoard(request, token);
+        FreeBoardResponse successResponse = freeBoardService.registerFreeBoard(request, token);
         assertThat(response).isEqualTo(successResponse);
     }
 
@@ -67,7 +71,7 @@ class FreeBoardServiceTest {
                 .keyword("test")
                 .build();
 
-        FreeBoardResponseDto freeBoardResponse = FreeBoardResponseDto.builder()
+        FreeBoardResponse freeBoardResponse = FreeBoardResponse.builder()
                 .title("테스트")
                 .contents("테스트 내용")
                 .writer(user)
@@ -75,27 +79,27 @@ class FreeBoardServiceTest {
                 .build();
 
         String boardId2 = UUID.randomUUID().toString();
-        FreeBoardResponseDto freeBoardResponse2 = FreeBoardResponseDto.builder()
+        FreeBoardResponse freeBoardResponse2 = FreeBoardResponse.builder()
                 .title("테스트2")
                 .contents("테스트 내용2")
                 .writer(user)
                 .boardId(boardId2)
                 .build();
-        List<FreeBoardResponseDto> list = new ArrayList<>();
+        List<FreeBoardResponse> list = new ArrayList<>();
         list.add(freeBoardResponse);
         list.add(freeBoardResponse2);
 
         String token = "token";
 
         when(freeBoardService.getSearchList(searchDto, token)).thenReturn(list);
-        List<FreeBoardResponseDto> result = freeBoardService.getSearchList(searchDto, token);
+        List<FreeBoardResponse> result = freeBoardService.getSearchList(searchDto, token);
         assertThat(result).contains(freeBoardResponse)
                 .contains(freeBoardResponse2);
     }
 
     @Test
     void 게시글_하나_가져오기(){
-        FreeBoardResponseDto responseDto = FreeBoardResponseDto.builder()
+        FreeBoardResponse responseDto = FreeBoardResponse.builder()
                 .boardId(boardId)
                 .writer(user)
                 .title("title")
@@ -110,7 +114,7 @@ class FreeBoardServiceTest {
         String token = "token";
 
         when(freeBoardService.getFreeBoard(boardId, token)).thenReturn(responseDto);
-        FreeBoardResponseDto result = freeBoardService.getFreeBoard(boardId, token);
+        FreeBoardResponse result = freeBoardService.getFreeBoard(boardId, token);
         assertThat(result).isEqualTo(responseDto);
     }
 
@@ -130,7 +134,7 @@ class FreeBoardServiceTest {
                 .title("title")
                 .contents("contents")
                 .build();
-        FreeBoardResponseDto responseDto = FreeBoardResponseDto.builder()
+        FreeBoardResponse responseDto = FreeBoardResponse.builder()
                 .boardId(boardId)
                 .writer(user)
                 .title("title")
@@ -143,7 +147,7 @@ class FreeBoardServiceTest {
         String token = "token";
 
         when(freeBoardService.updateFreeBoard(request, token)).thenReturn(responseDto);
-        FreeBoardResponseDto freeBoardResponse = freeBoardService.updateFreeBoard(request, token);
+        FreeBoardResponse freeBoardResponse = freeBoardService.updateFreeBoard(request, token);
         assertThat(responseDto).isEqualTo(freeBoardResponse);
     }
 
@@ -164,13 +168,13 @@ class FreeBoardServiceTest {
 
     @Test
     void 게시글_삭제(){
-        SuccessResponseDto responseDto = SuccessResponseDto.builder()
+        SuccessResponse responseDto = SuccessResponse.builder()
                 .statusCode(200)
                 .message("삭제 성공")
                 .build();
 
         when(freeBoardService.deleteFreeBoard(boardId)).thenReturn(responseDto);
-        SuccessResponseDto response = freeBoardService.deleteFreeBoard(boardId);
+        SuccessResponse response = freeBoardService.deleteFreeBoard(boardId);
         assertThat(responseDto).isEqualTo(response);
     }
 

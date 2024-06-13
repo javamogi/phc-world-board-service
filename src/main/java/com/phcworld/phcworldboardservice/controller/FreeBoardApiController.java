@@ -1,20 +1,18 @@
-package com.phcworld.phcworldboardservice.web;
+package com.phcworld.phcworldboardservice.controller;
 
-import com.phcworld.phcworldboardservice.dto.SuccessResponseDto;
-import com.phcworld.phcworldboardservice.dto.FreeBoardRequestDto;
-import com.phcworld.phcworldboardservice.dto.FreeBoardResponseDto;
-import com.phcworld.phcworldboardservice.dto.FreeBoardSearchDto;
+import com.phcworld.phcworldboardservice.controller.port.SuccessResponse;
+import com.phcworld.phcworldboardservice.domain.port.FreeBoardRequestDto;
+import com.phcworld.phcworldboardservice.controller.port.FreeBoardResponse;
+import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearchDto;
 import com.phcworld.phcworldboardservice.service.FreeBoardService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/freeboards")
@@ -28,13 +26,13 @@ public class FreeBoardApiController {
     })
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public FreeBoardResponseDto registerBoard(@RequestBody FreeBoardRequestDto requestDto, HttpServletRequest request) {
+    public FreeBoardResponse registerBoard(@RequestBody FreeBoardRequestDto requestDto, HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         return freeBoardService.registerFreeBoard(requestDto, token);
     }
 
     @GetMapping("")
-    public List<FreeBoardResponseDto> getList(FreeBoardSearchDto search, HttpServletRequest request){
+    public List<FreeBoardResponse> getList(FreeBoardSearchDto search, HttpServletRequest request){
         String token = request.getHeader("Authorization");
         return freeBoardService.getSearchList(search, token);
     }
@@ -44,10 +42,10 @@ public class FreeBoardApiController {
             @ApiResponse(responseCode = "409", description = "삭제된 게시글")
     })
     @GetMapping("/{freeBoardId}")
-    public FreeBoardResponseDto getFreeBoard(@PathVariable(name = "freeBoardId") String freeBoardId,
-                                                            HttpServletRequest request){
+    public FreeBoardResponse getFreeBoard(@PathVariable(name = "freeBoardId") String freeBoardId,
+                                          HttpServletRequest request){
         String token = request.getHeader("Authorization");
-        FreeBoardResponseDto result = freeBoardService.getFreeBoard(freeBoardId, token);
+        FreeBoardResponse result = freeBoardService.getFreeBoard(freeBoardId, token);
 //        return new ResponseEntity<>(result, HttpStatus.OK);
         return result;
     }
@@ -58,8 +56,8 @@ public class FreeBoardApiController {
             @ApiResponse(responseCode = "403", description = "수정 권한 없음")
     })
     @PatchMapping("")
-    public FreeBoardResponseDto updateBoard(@RequestBody FreeBoardRequestDto requestDto,
-                                            HttpServletRequest request) {
+    public FreeBoardResponse updateBoard(@RequestBody FreeBoardRequestDto requestDto,
+                                         HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         return freeBoardService.updateFreeBoard(requestDto, token);
     }
@@ -70,7 +68,7 @@ public class FreeBoardApiController {
             @ApiResponse(responseCode = "403", description = "삭제 권한 없음")
     })
     @DeleteMapping("/{boardId}")
-    public SuccessResponseDto deleteBoard(@PathVariable(name = "boardId") String boardId){
+    public SuccessResponse deleteBoard(@PathVariable(name = "boardId") String boardId){
         return freeBoardService.deleteFreeBoard(boardId);
     }
 

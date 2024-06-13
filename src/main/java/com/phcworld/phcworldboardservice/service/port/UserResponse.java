@@ -1,9 +1,9 @@
-package com.phcworld.phcworldboardservice.dto;
+package com.phcworld.phcworldboardservice.service.port;
 
 import lombok.Builder;
 
 @Builder
-public record UserResponseDto(
+public record UserResponse(
         String email,
         String name,
         String createDate,

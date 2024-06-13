@@ -6,6 +6,6 @@ public class NotMatchUserException extends CustomBaseException{
     }
 
     public NotMatchUserException(){
-        super(ErrorCode.UNAUTHORIZED);
+        super(ErrorCode.FORBIDDEN);
     }
 }

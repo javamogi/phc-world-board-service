@@ -1,15 +1,13 @@
-package com.phcworld.phcworldboardservice.repository;
+package com.phcworld.phcworldboardservice.infrastructure;
 
 import com.phcworld.phcworldboardservice.domain.QFreeBoard;
-import com.phcworld.phcworldboardservice.dto.FreeBoardSearchDto;
-import com.phcworld.phcworldboardservice.dto.FreeBoardSelectDto;
+import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearchDto;
+import com.phcworld.phcworldboardservice.infrastructure.port.FreeBoardSelectDto;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +20,7 @@ import java.util.Objects;
 
 @Repository
 @RequiredArgsConstructor
-public class FreeBoardRepositoryCustomImpl implements FreeBoardRepositoryCustom {
+public class FreeBoardJpaRepositoryCustomImpl implements FreeBoardJpaRepositoryCustom {
     private final JPAQueryFactory queryFactory;
     QFreeBoard freeBoard = QFreeBoard.freeBoard;
 //    QFreeBoardAnswer answer = QFreeBoardAnswer.freeBoardAnswer;
@@ -46,7 +44,7 @@ public class FreeBoardRepositoryCustomImpl implements FreeBoardRepositoryCustom 
 
         return queryFactory
                 .select(Projections.fields(FreeBoardSelectDto.class,
-                        freeBoard.boardId,
+                        freeBoard.id.as("boardId"),
                         freeBoard.writerId,
                         freeBoard.title,
                         freeBoard.contents,

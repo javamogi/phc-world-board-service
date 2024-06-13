@@ -1,4 +1,4 @@
-package com.phcworld.phcworldboardservice.dto;
+package com.phcworld.phcworldboardservice.infrastructure.port;
 
 import com.phcworld.phcworldboardservice.utils.LocalDateTimeUtils;
 import lombok.*;
@@ -13,7 +13,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class FreeBoardSelectDto {
 
-    private String boardId;
+//    private String boardId;
+    private Long boardId;
     private String writerId;
     private String title;
     private String contents;

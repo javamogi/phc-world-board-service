@@ -1,4 +1,4 @@
-package com.phcworld.phcworldboardservice.domain;
+package com.phcworld.phcworldboardservice.messagequeue.port;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

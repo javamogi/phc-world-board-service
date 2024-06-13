@@ -2,7 +2,7 @@ package com.phcworld.phcworldboardservice.freeboard.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.phcworld.phcworldboardservice.domain.Authority;
-import com.phcworld.phcworldboardservice.dto.FreeBoardRequestDto;
+import com.phcworld.phcworldboardservice.domain.port.FreeBoardRequestDto;
 import com.phcworld.phcworldboardservice.jwt.TokenProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Disabled("Disabled when build")
-class FreeBoardApiControllerTest {
+class FreeBoardEntityApiControllerTest {
 
     @Autowired
     private MockMvc mvc;

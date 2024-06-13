@@ -2,14 +2,17 @@ package com.phcworld.phcworldboardservice.messagequeue.producer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.phcworld.phcworldboardservice.domain.*;
+import com.phcworld.phcworldboardservice.infrastructure.FreeBoardEntity;
+import com.phcworld.phcworldboardservice.messagequeue.port.Field;
+import com.phcworld.phcworldboardservice.messagequeue.port.KafkaBoardDto;
+import com.phcworld.phcworldboardservice.messagequeue.port.Payload;
+import com.phcworld.phcworldboardservice.messagequeue.port.Schema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +38,7 @@ public class BoardProducer {
             .name("boards")
             .build();
 
-    public FreeBoard send(String topic, FreeBoard board){
+    public FreeBoardEntity send(String topic, FreeBoardEntity board){
         Payload payload = Payload.builder()
                 .board_id(board.getBoardId())
                 .writer_id(board.getWriterId())
