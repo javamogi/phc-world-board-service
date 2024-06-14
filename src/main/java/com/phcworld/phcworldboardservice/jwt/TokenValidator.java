@@ -1,15 +1,13 @@
 package com.phcworld.phcworldboardservice.jwt;
 
+import com.phcworld.phcworldboardservice.exception.model.BadRequestException;
+import com.phcworld.phcworldboardservice.exception.model.ErrorCode;
 import com.phcworld.phcworldboardservice.exception.model.UnauthorizedException;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,16 +19,19 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
-import java.util.Date;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
-public class TokenProvider {
+public class TokenValidator {
     private static final String AUTHORITIES_KEY = "auth";
 
-    private final Environment env;
+    private final Key key;
+
+    public TokenValidator(@Value("${jwt.secret}") String secretKey) {
+        String keyBase64Encoded = Base64.getEncoder().encodeToString(secretKey.getBytes());
+        byte[] keyBytes = Decoders.BASE64.decode(keyBase64Encoded);
+        this.key = Keys.hmacShaKeyFor(keyBytes);
+    }
 
     public Authentication getAuthentication(String accessToken) {
         // 토큰 복호화
@@ -49,16 +50,10 @@ public class TokenProvider {
         // UserDetails 객체를 만들어서 Authentication 리턴
         UserDetails principal = new org.springframework.security.core.userdetails.User(claims.getSubject(), "", authorities);
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(principal, "", authorities);
-
-        return authentication;
+        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
     private Claims parseClaims(String accessToken) {
-        String secret = env.getProperty("jwt.secret");
-        String keyBase64Encoded = Base64.getEncoder().encodeToString(secret.getBytes());
-        byte[] keyBytes = Decoders.BASE64.decode(keyBase64Encoded);
-        Key key = Keys.hmacShaKeyFor(keyBytes);
         try {
             return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
         } catch (ExpiredJwtException e) {
@@ -66,24 +61,23 @@ public class TokenProvider {
         }
     }
 
-    public String generateAccessToken(Authentication authentication, long now){
-        String secret = env.getProperty("jwt.secret");
-        String keyBase64Encoded = Base64.getEncoder().encodeToString(secret.getBytes());
-        byte[] keyBytes = Decoders.BASE64.decode(keyBase64Encoded);
-        Key key = Keys.hmacShaKeyFor(keyBytes);
-
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String userId = userDetails.getUsername();
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
-        Date accessTokenExpiresIn = new Date(now + 1000 * 60 * 30);
-        return Jwts.builder()
-                .setSubject(userId)
-                .claim(AUTHORITIES_KEY, authorities)
-                .setExpiration(accessTokenExpiresIn)
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            return true;
+        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+            log.debug("잘못된 JWT 서명입니다.");
+            throw new BadRequestException(ErrorCode.TOKEN_BAD_REQUEST);
+        } catch (ExpiredJwtException e) {
+            log.debug("만료된 JWT 토큰입니다.");
+            throw new UnauthorizedException();
+        } catch (UnsupportedJwtException e) {
+            log.debug("지원되지 않는 JWT 토큰입니다.");
+            throw new BadRequestException(ErrorCode.TOKEN_BAD_REQUEST);
+        } catch (IllegalArgumentException e) {
+            log.debug("JWT 잘못된 토큰입니다.");
+            throw new BadRequestException(ErrorCode.TOKEN_BAD_REQUEST);
+        }
     }
 
 }

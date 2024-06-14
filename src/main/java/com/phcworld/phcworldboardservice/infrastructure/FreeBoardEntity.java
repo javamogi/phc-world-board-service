@@ -1,6 +1,6 @@
 package com.phcworld.phcworldboardservice.infrastructure;
 
-import com.phcworld.phcworldboardservice.utils.LocalDateTimeUtils;
+import com.phcworld.phcworldboardservice.domain.FreeBoard;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +12,6 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Entity
@@ -27,11 +26,6 @@ import java.time.LocalDateTime;
 @Table(name = "boards",
 		indexes = {@Index(name = "idx__create_date", columnList = "createDate"),
 				@Index(name = "idx__writer_id_create_date", columnList = "writer_id, createDate")})
-//@SequenceGenerator(
-//		name = "BOARD_SEQ_GENERATOR",
-//		sequenceName = "BOARD_SEQ",
-//		initialValue = 1, allocationSize = 10000
-//)
 public class FreeBoardEntity {
 
 	@Id
@@ -69,42 +63,31 @@ public class FreeBoardEntity {
 	@Builder.Default
 	private Integer countOfAnswer = 0;
 
-	public void addCount() {
-		this.count += 1;
+	public static FreeBoardEntity from(FreeBoard freeBoard) {
+		return FreeBoardEntity.builder()
+				.id(freeBoard.getId())
+				.writerId(freeBoard.getWriterId())
+				.title(freeBoard.getTitle())
+				.contents(freeBoard.getContents())
+				.createDate(freeBoard.getCreateDate())
+				.updateDate(freeBoard.getCreateDate())
+				.count(freeBoard.getCount())
+				.isDeleted(freeBoard.isDeleted())
+				.countOfAnswer(freeBoard.getCountOfAnswer())
+				.build();
 	}
 
-	public String getFormattedCreateDate() {
-		return LocalDateTimeUtils.getTime(createDate);
+	public FreeBoard toModel() {
+		return FreeBoard.builder()
+				.id(id)
+				.writerId(writerId)
+				.title(title)
+				.contents(contents)
+				.createDate(createDate)
+				.updateDate(updateDate)
+				.count(count)
+				.countOfAnswer(countOfAnswer + 1)
+				.isDeleted(isDeleted)
+				.build();
 	}
-	
-	public String getFormattedUpdateDate() {
-		return LocalDateTimeUtils.getTime(updateDate);
-	}
-
-	public void update(String title, String contents) {
-		this.title = title;
-		this.contents = contents;
-	}
-
-	public Boolean isNew(){
-		final int HOUR_OF_DAY = 24;
-		final int MINUTES_OF_HOUR = 60;
-
-		long createdDateAndNowDifferenceMinutes =
-				Duration.between(createDate == null ? LocalDateTime.now() : createDate, LocalDateTime.now()).toMinutes();
-        return (createdDateAndNowDifferenceMinutes / MINUTES_OF_HOUR) < HOUR_OF_DAY;
-	}
-
-	public boolean matchUser(String userId) {
-		return !this.writerId.equals(userId);
-	}
-
-	public void delete() {
-		this.isDeleted = true;
-	}
-
-	public void addCountOfAnswer() {
-		this.countOfAnswer++;
-	}
-
 }

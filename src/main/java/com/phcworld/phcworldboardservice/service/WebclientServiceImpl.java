@@ -1,7 +1,8 @@
 package com.phcworld.phcworldboardservice.service;
 
-import com.phcworld.phcworldboardservice.infrastructure.FreeBoardEntity;
-import com.phcworld.phcworldboardservice.infrastructure.port.FreeBoardAnswerResponse;
+import com.phcworld.phcworldboardservice.controller.port.WebclientService;
+import com.phcworld.phcworldboardservice.domain.FreeBoard;
+import com.phcworld.phcworldboardservice.service.port.FreeBoardAnswerResponse;
 import com.phcworld.phcworldboardservice.service.port.UserResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,13 +22,14 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class WebclientService {
+public class WebclientServiceImpl implements WebclientService {
 
     private final WebClient.Builder webClient;
     private final Environment env;
     private final CircuitBreakerFactory circuitBreakerFactory;
 
-    public UserResponse getUserResponseDto(String token, FreeBoardEntity freeBoardEntity) {
+    @Override
+    public UserResponse getUser(String token, FreeBoard freeBoard) {
 
         log.info("Before call users microservice");
         CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
@@ -40,7 +42,7 @@ public class WebclientService {
                         .get()
                         .uri(uriBuilder -> uriBuilder
                                 .path("/{id}")
-                                .build(freeBoardEntity.getWriterId()))
+                                .build(freeBoard.getWriterId()))
                         .header(HttpHeaders.AUTHORIZATION, token)
                         .retrieve()
                         .bodyToMono(UserResponse.class)
@@ -56,7 +58,13 @@ public class WebclientService {
         return user;
     }
 
-    public Map<String, UserResponse> getUserResponseDtoMap(String token, List<String> userIds) {
+    @Override
+    public Map<String, UserResponse> getUsers(String token, List<FreeBoard> freeBoards) {
+
+        List<String> userIds = freeBoards.stream()
+				.map(FreeBoard::getWriterId)
+				.distinct()
+				.toList();
 
         log.info("Before call users microservice");
         CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
@@ -79,7 +87,8 @@ public class WebclientService {
         return users;
     }
 
-    public List<FreeBoardAnswerResponse> getFreeBoardAnswerResponseDtoList(String token, FreeBoardEntity freeBoardEntity) {
+    @Override
+    public List<FreeBoardAnswerResponse> getAnswers(String token, FreeBoard freeBoard) {
 
         log.info("Before call users microservice");
         CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
@@ -91,7 +100,7 @@ public class WebclientService {
                         .get()
                         .uri(uriBuilder -> uriBuilder
                                 .path("/freeboards/{id}")
-                                .build(freeBoardEntity.getBoardId()))
+                                .build(freeBoard.getId()))
                         .header(HttpHeaders.AUTHORIZATION, token)
                         .retrieve()
                         .bodyToMono(new ParameterizedTypeReference<List<FreeBoardAnswerResponse>>() {})

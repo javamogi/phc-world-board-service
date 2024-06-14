@@ -1,6 +1,5 @@
 package com.phcworld.phcworldboardservice.infrastructure;
 
-import com.phcworld.phcworldboardservice.domain.QFreeBoard;
 import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearchDto;
 import com.phcworld.phcworldboardservice.infrastructure.port.FreeBoardSelectDto;
 import com.querydsl.core.BooleanBuilder;
@@ -22,7 +21,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class FreeBoardJpaRepositoryCustomImpl implements FreeBoardJpaRepositoryCustom {
     private final JPAQueryFactory queryFactory;
-    QFreeBoard freeBoard = QFreeBoard.freeBoard;
+    QFreeBoardEntity freeBoard = QFreeBoardEntity.freeBoardEntity;
 //    QFreeBoardAnswer answer = QFreeBoardAnswer.freeBoardAnswer;
 
     @Override
@@ -51,7 +50,8 @@ public class FreeBoardJpaRepositoryCustomImpl implements FreeBoardJpaRepositoryC
                         freeBoard.createDate,
                         freeBoard.updateDate,
                         freeBoard.countOfAnswer,
-                        freeBoard.count))
+                        freeBoard.count,
+                        freeBoard.isDeleted))
 //                        ExpressionUtils.as(
 //                                JPAExpressions
 //                                        .select(answer.count())

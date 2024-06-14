@@ -1,8 +1,8 @@
 package com.phcworld.phcworldboardservice.controller.port;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.phcworld.phcworldboardservice.infrastructure.FreeBoardEntity;
-import com.phcworld.phcworldboardservice.infrastructure.port.FreeBoardAnswerResponse;
+import com.phcworld.phcworldboardservice.domain.FreeBoard;
+import com.phcworld.phcworldboardservice.service.port.FreeBoardAnswerResponse;
 import com.phcworld.phcworldboardservice.service.port.UserResponse;
 import lombok.Builder;
 
@@ -23,15 +23,41 @@ public record FreeBoardResponse(
         Boolean isDeleteAuthority,
         Boolean isModifyAuthority
 ) {
-    public static FreeBoardResponse of(UserResponse user, FreeBoardEntity freeBoardEntity){
+
+    public static FreeBoardResponse of(UserResponse user, FreeBoard freeBoard){
         return FreeBoardResponse.builder()
-                .boardId(freeBoardEntity.getId())
-                .title(freeBoardEntity.getTitle())
-                .contents(freeBoardEntity.getContents())
+                .boardId(freeBoard.getId())
+                .title(freeBoard.getTitle())
+                .contents(freeBoard.getContents())
                 .writer(user)
-                .isNew(freeBoardEntity.isNew())
-                .count(freeBoardEntity.getCount())
-                .countOfAnswer(freeBoardEntity.getCountOfAnswer())
+                .isNew(freeBoard.isNew())
+                .count(freeBoard.getCount())
+                .countOfAnswer(freeBoard.getCountOfAnswer())
+                .build();
+    }
+
+    public static FreeBoardResponse of(FreeBoard freeBoard){
+        return FreeBoardResponse.builder()
+                .boardId(freeBoard.getId())
+                .title(freeBoard.getTitle())
+                .contents(freeBoard.getContents())
+                .writer(null)
+                .isNew(freeBoard.isNew())
+                .count(freeBoard.getCount())
+                .countOfAnswer(freeBoard.getCountOfAnswer())
+                .build();
+    }
+
+    public static FreeBoardResponse of(UserResponse user, FreeBoard freeBoard, List<FreeBoardAnswerResponse> answers){
+        return FreeBoardResponse.builder()
+                .boardId(freeBoard.getId())
+                .title(freeBoard.getTitle())
+                .contents(freeBoard.getContents())
+                .writer(user)
+                .isNew(freeBoard.isNew())
+                .count(freeBoard.getCount())
+                .countOfAnswer(freeBoard.getCountOfAnswer())
+                .answers(answers)
                 .build();
     }
 

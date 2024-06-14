@@ -1,11 +1,11 @@
 package com.phcworld.phcworldboardservice.exception.model;
 
-public class NotMatchUserException extends CustomBaseException{
-    public NotMatchUserException(ErrorCode errorCode) {
+public class ForbiddenException extends CustomBaseException{
+    public ForbiddenException(ErrorCode errorCode) {
         super(errorCode.getMessage(), errorCode);
     }
 
-    public NotMatchUserException(){
+    public ForbiddenException(){
         super(ErrorCode.FORBIDDEN);
     }
 }

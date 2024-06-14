@@ -1,9 +1,8 @@
 package com.phcworld.phcworldboardservice.infrastructure.port;
 
-import com.phcworld.phcworldboardservice.utils.LocalDateTimeUtils;
+import com.phcworld.phcworldboardservice.domain.FreeBoard;
 import lombok.*;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Builder
@@ -22,29 +21,19 @@ public class FreeBoardSelectDto {
     private LocalDateTime updateDate;
     private Integer count;
     private Integer countOfAnswer;
+    private Boolean isDeleted;
 
-    public String getFormattedCreateDate() {
-        return LocalDateTimeUtils.getTime(createDate);
+    public FreeBoard toModel() {
+        return FreeBoard.builder()
+                .id(boardId)
+                .writerId(writerId)
+                .title(title)
+                .contents(contents)
+                .createDate(createDate)
+                .updateDate(updateDate)
+                .count(count)
+                .countOfAnswer(countOfAnswer)
+                .isDeleted(isDeleted)
+                .build();
     }
-
-    public String getFormattedUpdateDate() {
-        return LocalDateTimeUtils.getTime(updateDate);
-    }
-
-    public Boolean isNew(){
-        final int HOUR_OF_DAY = 24;
-        final int MINUTES_OF_HOUR = 60;
-
-        long createdDateAndNowDifferenceMinutes =
-                Duration.between(createDate == null ? LocalDateTime.now() : createDate, LocalDateTime.now()).toMinutes();
-        return (createdDateAndNowDifferenceMinutes / MINUTES_OF_HOUR) < HOUR_OF_DAY;
-    }
-
-    public Integer getCountOfAnswer(){
-        if(countOfAnswer == null){
-            return 0;
-        }
-        return countOfAnswer.intValue();
-    }
-
 }

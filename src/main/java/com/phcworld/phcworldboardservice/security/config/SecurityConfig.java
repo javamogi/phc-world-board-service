@@ -1,6 +1,6 @@
 package com.phcworld.phcworldboardservice.security.config;
 
-import com.phcworld.phcworldboardservice.jwt.TokenProvider;
+import com.phcworld.phcworldboardservice.jwt.TokenValidator;
 import com.phcworld.phcworldboardservice.jwt.config.JwtSecurityConfig;
 import com.phcworld.phcworldboardservice.jwt.entry.JwtAuthenticationEntryPoint;
 import com.phcworld.phcworldboardservice.jwt.filter.JwtExceptionFilter;
@@ -25,11 +25,10 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final TokenProvider tokenProvider;
+    private final TokenValidator tokenValidator;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtExceptionFilter jwtExceptionFilter;
-    private final Environment env;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -86,7 +85,7 @@ public class SecurityConfig {
                 // 여기서는 세션을 사용하지 않기 때문에 세션 설정을 Stateless 로 설정
                 .sessionManagement(sessionManagementConfig -> sessionManagementConfig.
                         sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .with(new JwtSecurityConfig(tokenProvider, jwtExceptionFilter), Customizer.withDefaults())
+                .with(new JwtSecurityConfig(tokenValidator, jwtExceptionFilter), Customizer.withDefaults())
                 .build();
 
     }

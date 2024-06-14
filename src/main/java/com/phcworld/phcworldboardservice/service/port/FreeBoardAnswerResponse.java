@@ -1,4 +1,4 @@
-package com.phcworld.phcworldboardservice.infrastructure.port;
+package com.phcworld.phcworldboardservice.service.port;
 
 import com.phcworld.phcworldboardservice.service.port.UserResponse;
 import lombok.Builder;
