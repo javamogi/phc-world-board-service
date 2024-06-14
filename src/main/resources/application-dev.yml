@@ -21,10 +21,17 @@ spring:
       hibernate:
         format_sql: true
 
-logging:
-  level:
-    com.phcworld: debug
-    org.springframework.security: debug
+server:
+  port: 8081
+  servlet:
+    encoding:
+      charset: UTF-8
+      force-request: true
+      force: true
+      force-response: true
 
 jwt:
-  secret: c3ByaW5nLXNlY3VyaXR5LWp3dC1waGMtd29ybGQtc2VjcmV0LWtleQ==
+  secret: spring-boot-security-test-secret-key-dev
+kafka:
+  broker:
+    url: 127.0.0.1:9092
