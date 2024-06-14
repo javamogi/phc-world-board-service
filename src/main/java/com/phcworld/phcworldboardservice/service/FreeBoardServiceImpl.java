@@ -1,6 +1,6 @@
 package com.phcworld.phcworldboardservice.service;
 
-import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearchDto;
+import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearch;
 import com.phcworld.phcworldboardservice.controller.port.FreeBoardService;
 import com.phcworld.phcworldboardservice.domain.Authority;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
@@ -12,6 +12,7 @@ import com.phcworld.phcworldboardservice.security.utils.SecurityUtil;
 import com.phcworld.phcworldboardservice.service.port.FreeBoardRepository;
 import com.phcworld.phcworldboardservice.service.port.KafkaProducer;
 import com.phcworld.phcworldboardservice.service.port.LocalDateTimeHolder;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +25,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Builder
 public class FreeBoardServiceImpl implements FreeBoardService {
 	private final FreeBoardRepository freeBoardRepository;
 //	private final UploadFileService uploadFileService;
@@ -45,7 +47,7 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<FreeBoard> getSearchList(FreeBoardSearchDto search) {
+	public List<FreeBoard> getSearchList(FreeBoardSearch search) {
 		PageRequest pageRequest = PageRequest.of(
 				search.pageNum() - 1,
 				search.pageSize(),
@@ -115,12 +117,6 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 
 	@Override
 	public List<FreeBoard> getFreeBoardsByUserId(String writerId) {
-		String userId = SecurityUtil.getCurrentMemberId();
-		Authority authorities = SecurityUtil.getAuthorities();
-		if(!writerId.equals(userId) && authorities != Authority.ROLE_ADMIN){
-			throw new ForbiddenException();
-		}
-
 		return freeBoardRepository.findByWriterId(writerId);
 	}
 

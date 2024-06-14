@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface FreeBoardService {
     FreeBoard register(FreeBoardRequest request);
-    List<FreeBoard> getSearchList(FreeBoardSearchDto search);
+    List<FreeBoard> getSearchList(FreeBoardSearch search);
     FreeBoard getFreeBoard(Long boardId);
     FreeBoard update(FreeBoardRequest request);
     FreeBoard delete(Long boardId);

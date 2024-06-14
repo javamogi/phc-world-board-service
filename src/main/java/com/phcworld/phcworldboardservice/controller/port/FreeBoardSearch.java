@@ -3,7 +3,7 @@ package com.phcworld.phcworldboardservice.controller.port;
 import lombok.Builder;
 
 @Builder
-public record FreeBoardSearchDto(
+public record FreeBoardSearch(
         int pageNum,
         int pageSize,
         String keyword,

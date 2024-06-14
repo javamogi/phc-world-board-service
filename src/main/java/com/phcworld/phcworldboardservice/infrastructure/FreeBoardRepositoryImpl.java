@@ -1,6 +1,6 @@
 package com.phcworld.phcworldboardservice.infrastructure;
 
-import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearchDto;
+import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearch;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
 import com.phcworld.phcworldboardservice.infrastructure.port.FreeBoardSelectDto;
 import com.phcworld.phcworldboardservice.service.port.FreeBoardRepository;
@@ -32,7 +32,7 @@ public class FreeBoardRepositoryImpl implements FreeBoardRepository {
     }
 
     @Override
-    public List<FreeBoard> findByKeyword(FreeBoardSearchDto searchDto, Pageable pageable) {
+    public List<FreeBoard> findByKeyword(FreeBoardSearch searchDto, Pageable pageable) {
         return freeBoardJpaRepository.findByKeyword(searchDto, pageable)
                 .stream()
                 .map(FreeBoardSelectDto::toModel)

@@ -1,7 +1,7 @@
 package com.phcworld.phcworldboardservice.controller;
 
 import com.phcworld.phcworldboardservice.controller.port.FreeBoardResponse;
-import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearchDto;
+import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearch;
 import com.phcworld.phcworldboardservice.controller.port.FreeBoardService;
 import com.phcworld.phcworldboardservice.controller.port.WebclientService;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
@@ -11,6 +11,7 @@ import com.phcworld.phcworldboardservice.service.port.UserResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/freeboards")
 @RequiredArgsConstructor
+@Builder
 public class FreeBoardApiController {
 
 
@@ -31,18 +33,18 @@ public class FreeBoardApiController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<FreeBoardResponse> registerBoard(@RequestBody FreeBoardRequest requestDto, HttpServletRequest request) {
-        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+    public ResponseEntity<FreeBoardResponse> registerBoard(@RequestBody FreeBoardRequest requestDto,
+                                                           @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
         FreeBoard freeBoard = freeBoardService.register(requestDto);
         UserResponse user = webclientService.getUser(token, freeBoard);
         return ResponseEntity
-                .ok()
+                .status(HttpStatus.CREATED)
                 .body(FreeBoardResponse.of(user, freeBoard));
     }
 
     @GetMapping("")
-    public ResponseEntity<List<FreeBoardResponse>> getList(FreeBoardSearchDto search, HttpServletRequest request){
-        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+    public ResponseEntity<List<FreeBoardResponse>> getList(FreeBoardSearch search,
+                                                           @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
         List<FreeBoard> freeBoards = freeBoardService.getSearchList(search);
         Map<String, UserResponse> users = webclientService.getUsers(token, freeBoards);
         List<FreeBoardResponse> result = freeBoards.stream()
@@ -68,8 +70,7 @@ public class FreeBoardApiController {
     })
     @GetMapping("/{freeBoardId}")
     public ResponseEntity<FreeBoardResponse> getFreeBoard(@PathVariable(name = "freeBoardId") Long freeBoardId,
-                                          HttpServletRequest request){
-        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+                                                          @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
         FreeBoard freeBoard = freeBoardService.getFreeBoard(freeBoardId);
         UserResponse user = webclientService.getUser(token, freeBoard);
         List<FreeBoardAnswerResponse> answers = webclientService.getAnswers(token, freeBoard);
@@ -85,8 +86,7 @@ public class FreeBoardApiController {
     })
     @PatchMapping("")
     public ResponseEntity<FreeBoardResponse> updateBoard(@RequestBody FreeBoardRequest requestDto,
-                                         HttpServletRequest request) {
-        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+                                                         @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
         FreeBoard freeBoard = freeBoardService.update(requestDto);
         UserResponse user = webclientService.getUser(token, freeBoard);
         return ResponseEntity
@@ -101,8 +101,7 @@ public class FreeBoardApiController {
     })
     @DeleteMapping("/{boardId}")
     public ResponseEntity<FreeBoardResponse> deleteBoard(@PathVariable(name = "boardId") Long boardId,
-                                                         HttpServletRequest request){
-        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+                                                         @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
         FreeBoard freeBoard = freeBoardService.delete(boardId);
         UserResponse user = webclientService.getUser(token, freeBoard);
         return ResponseEntity

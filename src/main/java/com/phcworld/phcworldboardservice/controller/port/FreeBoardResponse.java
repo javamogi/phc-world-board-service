@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
 import com.phcworld.phcworldboardservice.service.port.FreeBoardAnswerResponse;
 import com.phcworld.phcworldboardservice.service.port.UserResponse;
+import com.phcworld.phcworldboardservice.utils.LocalDateTimeUtils;
 import lombok.Builder;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public record FreeBoardResponse(
         Integer count,
         Integer countOfAnswer,
         Boolean isNew,
+        Boolean isDelete,
         List<FreeBoardAnswerResponse> answers,
         Boolean isDeleteAuthority,
         Boolean isModifyAuthority
@@ -33,6 +35,8 @@ public record FreeBoardResponse(
                 .isNew(freeBoard.isNew())
                 .count(freeBoard.getCount())
                 .countOfAnswer(freeBoard.getCountOfAnswer())
+                .createDate(LocalDateTimeUtils.getTime(freeBoard.getCreateDate()))
+                .isDelete(freeBoard.isDeleted())
                 .build();
     }
 
@@ -41,10 +45,11 @@ public record FreeBoardResponse(
                 .boardId(freeBoard.getId())
                 .title(freeBoard.getTitle())
                 .contents(freeBoard.getContents())
-                .writer(null)
                 .isNew(freeBoard.isNew())
                 .count(freeBoard.getCount())
                 .countOfAnswer(freeBoard.getCountOfAnswer())
+                .createDate(LocalDateTimeUtils.getTime(freeBoard.getCreateDate()))
+                .isDelete(freeBoard.isDeleted())
                 .build();
     }
 
@@ -58,6 +63,8 @@ public record FreeBoardResponse(
                 .count(freeBoard.getCount())
                 .countOfAnswer(freeBoard.getCountOfAnswer())
                 .answers(answers)
+                .createDate(LocalDateTimeUtils.getTime(freeBoard.getCreateDate()))
+                .isDelete(freeBoard.isDeleted())
                 .build();
     }
 

@@ -23,21 +23,6 @@ public class BoardProducerImpl implements KafkaProducer {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper mapper;
 
-//    List<Field> fields = Arrays.asList(
-//            new Field("int64", false, "id"),
-//            new Field("int8", false, "is_deleted"),
-//            new Field("string", false, "update_date"),
-//            new Field("string", true, "title"),
-//            new Field("string", true, "contents"),
-//            new Field("string", false, "writer_id"));
-//    List<Field> fields;
-//    Schema schema = Schema.builder()
-//            .type("struct")
-//            .fields(fields)
-//            .optional(false)
-//            .name("boards")
-//            .build();
-
     @Override
     public FreeBoard send(String topic, FreeBoard board, boolean isUpdate){
         Payload payload = Payload.builder()

@@ -1,6 +1,6 @@
 package com.phcworld.phcworldboardservice.infrastructure;
 
-import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearchDto;
+import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearch;
 import com.phcworld.phcworldboardservice.infrastructure.port.FreeBoardSelectDto;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
@@ -25,7 +25,7 @@ public class FreeBoardJpaRepositoryCustomImpl implements FreeBoardJpaRepositoryC
 //    QFreeBoardAnswer answer = QFreeBoardAnswer.freeBoardAnswer;
 
     @Override
-    public List<FreeBoardSelectDto> findByKeyword(FreeBoardSearchDto searchDto, Pageable pageable){
+    public List<FreeBoardSelectDto> findByKeyword(FreeBoardSearch searchDto, Pageable pageable){
         List<OrderSpecifier> orders = getOrderSpecifier(pageable);
 
         List<Long> ids = queryFactory
@@ -34,7 +34,6 @@ public class FreeBoardJpaRepositoryCustomImpl implements FreeBoardJpaRepositoryC
                 .where(
                         findByTitle(searchDto),
                         findContents(searchDto),
-                        findUserName(searchDto),
                         freeBoard.isDeleted.isFalse())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -64,7 +63,7 @@ public class FreeBoardJpaRepositoryCustomImpl implements FreeBoardJpaRepositoryC
                 .fetch();
     }
 
-    private BooleanExpression findByTitle(FreeBoardSearchDto searchDto){
+    private BooleanExpression findByTitle(FreeBoardSearch searchDto){
         if(Objects.isNull(searchDto.searchType())
                 || searchDto.keyword().isEmpty()
                 || !searchDto.searchType().equals(0)){
@@ -73,7 +72,7 @@ public class FreeBoardJpaRepositoryCustomImpl implements FreeBoardJpaRepositoryC
         return freeBoard.title.contains(searchDto.keyword());
     }
 
-    private BooleanBuilder findContents(FreeBoardSearchDto searchDto){
+    private BooleanBuilder findContents(FreeBoardSearch searchDto){
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         if(Objects.isNull(searchDto.searchType())
                 || searchDto.keyword().isEmpty()
@@ -81,17 +80,6 @@ public class FreeBoardJpaRepositoryCustomImpl implements FreeBoardJpaRepositoryC
             return null;
         }
         return booleanBuilder.or(freeBoard.contents.contains(searchDto.keyword()));
-    }
-
-    private BooleanBuilder findUserName(FreeBoardSearchDto searchDto){
-        BooleanBuilder booleanBuilder = new BooleanBuilder();
-        if(Objects.isNull(searchDto.searchType())
-                || searchDto.keyword().isEmpty()
-                || !searchDto.searchType().equals(2)){
-            return null;
-        }
-//        return booleanBuilder.or(user.name.contains(searchDto.keyword()));
-        return null;
     }
 
     private List<OrderSpecifier> getOrderSpecifier(Pageable pageable){
