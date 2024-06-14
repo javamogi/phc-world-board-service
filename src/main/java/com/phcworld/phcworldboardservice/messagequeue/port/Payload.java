@@ -17,4 +17,6 @@ public class Payload {
     private String update_date;
     private String title;
     private String contents;
+    private Integer count;
+    private Integer count_of_answer;
 }

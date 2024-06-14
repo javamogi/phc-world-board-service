@@ -32,12 +32,16 @@ public class BoardProducerImpl implements KafkaProducer {
                 .title(board.getTitle())
                 .contents(board.getContents())
                 .update_date(LocalDateTime.now().withNano(0).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")))
+                .count(board.getCount())
+                .count_of_answer(board.getCountOfAnswer())
                 .build();
         List<Field> fields;
         if(isUpdate){
             fields = Arrays.asList(
                     new Field("int64", false, "id"),
                     new Field("int8", false, "is_deleted"),
+                    new Field("int32", true, "count"),
+                    new Field("int32", true, "count_of_answer"),
                     new Field("string", false, "update_date"),
                     new Field("string", true, "title"),
                     new Field("string", true, "contents"),

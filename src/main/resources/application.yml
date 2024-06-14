@@ -1,6 +1,8 @@
 spring:
   application:
     name: board-api-service
+  profiles:
+    active: prod
 
 server:
   port: 8081

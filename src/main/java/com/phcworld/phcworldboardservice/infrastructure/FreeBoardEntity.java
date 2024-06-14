@@ -86,7 +86,7 @@ public class FreeBoardEntity {
 				.createDate(createDate)
 				.updateDate(updateDate)
 				.count(count)
-				.countOfAnswer(countOfAnswer + 1)
+				.countOfAnswer(countOfAnswer)
 				.isDeleted(isDeleted)
 				.build();
 	}
