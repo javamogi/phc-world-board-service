@@ -1,4 +1,7 @@
 spring:
+  cloud:
+    bus:
+      enabled: false
   h2:
     console:
       enabled: true
@@ -30,8 +33,10 @@ server:
       force: true
       force-response: true
 
-jwt:
-  secret: spring-boot-security-test-secret-key-dev
-kafka:
-  broker:
-    url: 127.0.0.1:9092
+eureka:
+  client:
+    enabled: false
+management:
+  health:
+    rabbit:
+      enabled: false

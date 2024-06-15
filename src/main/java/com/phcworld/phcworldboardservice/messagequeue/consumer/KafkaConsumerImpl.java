@@ -35,10 +35,10 @@ public class KafkaConsumerImpl implements KafkaConsumer {
             throw new InternalServerErrorException();
         }
 
-        Long boardId = (Long) map.get("id");
+        Long boardId = (long) (int) map.get("freeBoardId");
         FreeBoard freeBoard = repository.findById(boardId)
                 .orElseThrow(NotFoundException::new);
-        freeBoard.addCountOfAnswer();
+        freeBoard = freeBoard.addCountOfAnswer();
         repository.save(freeBoard);
     }
 }
