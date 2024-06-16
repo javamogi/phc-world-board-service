@@ -1,4 +1,7 @@
 spring:
+  cloud:
+    bus:
+      enabled: false
   h2:
     console:
       enabled: true
@@ -29,6 +32,14 @@ server:
       force-request: true
       force: true
       force-response: true
+
+eureka:
+  client:
+    enabled: false
+management:
+  health:
+    rabbit:
+      enabled: false
 
 jwt:
   secret: spring-boot-security-test-secret-key-dev
