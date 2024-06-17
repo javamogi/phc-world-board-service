@@ -70,7 +70,7 @@ public class TokenValidator {
             throw new BadRequestException(ErrorCode.TOKEN_BAD_REQUEST);
         } catch (ExpiredJwtException e) {
             log.debug("만료된 JWT 토큰입니다.");
-            throw new UnauthorizedException();
+            throw new BadRequestException(ErrorCode.TOKEN_EXPIRED);
         } catch (UnsupportedJwtException e) {
             log.debug("지원되지 않는 JWT 토큰입니다.");
             throw new BadRequestException(ErrorCode.TOKEN_BAD_REQUEST);
