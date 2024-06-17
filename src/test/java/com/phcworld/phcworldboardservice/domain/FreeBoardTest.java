@@ -20,10 +20,13 @@ class FreeBoardTest {
                 .title("제목")
                 .contents("내용")
                 .build();
-        String userId = "1111";
+        User user = User.builder()
+                .userId("1111")
+                .name("일일일일")
+                .build();
 
         // when
-        FreeBoard result = FreeBoard.from(freeBoardRequest, userId, new FakeLocalDateTimeHolder(time));
+        FreeBoard result = FreeBoard.from(freeBoardRequest, user, new FakeLocalDateTimeHolder(time));
 
         // then
         assertThat(result.getId()).isNull();
@@ -41,13 +44,18 @@ class FreeBoardTest {
     void g(){
         // given
         LocalDateTime time = LocalDateTime.now();
+        User user = User.builder()
+                .userId("1111")
+                .name("일일일일")
+                .profileImage("blank.jpg")
+                .build();
         FreeBoard freeBoard = FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId("1111")
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleteAuthority(true)
@@ -67,13 +75,18 @@ class FreeBoardTest {
     void matchWriter(){
         // given
         LocalDateTime time = LocalDateTime.of(2024, 6, 14, 11, 11, 11, 111111);
+        User user = User.builder()
+                .userId("1111")
+                .name("일일일일")
+                .profileImage("blank.jpg")
+                .build();
         FreeBoard freeBoard = FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId("1111")
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleteAuthority(true)
@@ -93,13 +106,18 @@ class FreeBoardTest {
     void addCount(){
         // given
         LocalDateTime time = LocalDateTime.of(2024, 6, 14, 11, 11, 11, 111111);
+        User user = User.builder()
+                .userId("1111")
+                .name("일일일일")
+                .profileImage("blank.jpg")
+                .build();
         FreeBoard freeBoard = FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId("1111")
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleteAuthority(true)
@@ -119,13 +137,18 @@ class FreeBoardTest {
     void update(){
         // given
         LocalDateTime time = LocalDateTime.of(2024, 6, 14, 11, 11, 11, 111111);
+        User user = User.builder()
+                .userId("1111")
+                .name("일일일일")
+                .profileImage("blank.jpg")
+                .build();
         FreeBoard freeBoard = FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId("1111")
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleteAuthority(true)
@@ -146,13 +169,18 @@ class FreeBoardTest {
     void delete(){
         // given
         LocalDateTime time = LocalDateTime.of(2024, 6, 14, 11, 11, 11, 111111);
+        User user = User.builder()
+                .userId("1111")
+                .name("일일일일")
+                .profileImage("blank.jpg")
+                .build();
         FreeBoard freeBoard = FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId("1111")
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleteAuthority(true)
@@ -172,13 +200,18 @@ class FreeBoardTest {
     void getAuthoritiesWhenEqualWriter(){
         // given
         LocalDateTime time = LocalDateTime.of(2024, 6, 14, 11, 11, 11, 111111);
+        User user = User.builder()
+                .userId("1111")
+                .name("일일일일")
+                .profileImage("blank.jpg")
+                .build();
         FreeBoard freeBoard = FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId("1111")
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleteAuthority(false)
@@ -199,13 +232,18 @@ class FreeBoardTest {
     void getAuthoritiesWhenAdmin(){
         // given
         LocalDateTime time = LocalDateTime.of(2024, 6, 14, 11, 11, 11, 111111);
+        User user = User.builder()
+                .userId("1111")
+                .name("일일일일")
+                .profileImage("blank.jpg")
+                .build();
         FreeBoard freeBoard = FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId("1111")
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleteAuthority(false)
@@ -226,13 +264,18 @@ class FreeBoardTest {
     void addCountOfAnswer(){
         // given
         LocalDateTime time = LocalDateTime.of(2024, 6, 14, 11, 11, 11, 111111);
+        User user = User.builder()
+                .userId("1111")
+                .name("일일일일")
+                .profileImage("blank.jpg")
+                .build();
         FreeBoard freeBoard = FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId("1111")
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleteAuthority(true)

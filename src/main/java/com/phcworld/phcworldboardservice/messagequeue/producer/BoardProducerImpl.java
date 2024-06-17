@@ -27,7 +27,7 @@ public class BoardProducerImpl implements KafkaProducer {
     public FreeBoard send(String topic, FreeBoard board, boolean isUpdate){
         Payload payload = Payload.builder()
                 .id(board.getId())
-                .writer_id(board.getWriterId())
+                .writer_id(board.getWriter().getUserId())
                 .is_deleted((byte)(Boolean.TRUE.equals(board.isDeleted()) ? 1 : 0))
                 .title(board.getTitle())
                 .contents(board.getContents())

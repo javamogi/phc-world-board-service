@@ -20,11 +20,10 @@ import java.util.Map;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class KafkaConsumerImpl implements KafkaConsumer {
+public class AnswerConsumerImpl {
     private final FreeBoardRepository repository;
     private final ObjectMapper mapper;
 
-//    @KafkaListener(topics = "board-topic")
     @KafkaListener(topics = "answers")
     @Transactional
     public void updateCountOfAnswer(String kafkaMessage){
@@ -33,9 +32,8 @@ public class KafkaConsumerImpl implements KafkaConsumer {
         Map<Object, Object> map = new HashMap<>();
         try {
             JsonNode rootNode = mapper.readTree(kafkaMessage);
-            JsonNode payload = rootNode.get("payload");
-            log.info(payload.toString());
-            map = mapper.convertValue(payload, new TypeReference<Map<Object, Object>>() {});
+            JsonNode payloadNode = rootNode.get("payload");
+            map = mapper.convertValue(payloadNode, new TypeReference<Map<Object, Object>>() {});
         } catch (JsonProcessingException e){
             throw new InternalServerErrorException();
         }
