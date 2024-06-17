@@ -29,65 +29,6 @@ public class WebclientServiceImpl implements WebclientService {
     private final CircuitBreakerFactory circuitBreakerFactory;
 
     @Override
-    public UserResponse getUser(String token, FreeBoard freeBoard) {
-
-        log.info("Before call users microservice");
-        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
-
-        UserResponse user = circuitBreaker.run(
-                () -> webClient.build()
-//                        .mutate().baseUrl("http://localhost:8080/users")
-				        .mutate().baseUrl(env.getProperty("user_service.url"))
-                        .build()
-                        .get()
-                        .uri(uriBuilder -> uriBuilder
-                                .path("/{id}")
-                                .build(freeBoard.getWriterId()))
-                        .header(HttpHeaders.AUTHORIZATION, token)
-                        .retrieve()
-                        .bodyToMono(UserResponse.class)
-                        .block(),
-                throwable -> UserResponse.builder()
-                        .email("")
-                        .name("")
-                        .createDate("")
-                        .profileImage("")
-                        .userId("")
-                        .build());
-        log.info("After called users microservice");
-        return user;
-    }
-
-    @Override
-    public Map<String, UserResponse> getUsers(String token, List<FreeBoard> freeBoards) {
-
-        List<String> userIds = freeBoards.stream()
-				.map(FreeBoard::getWriterId)
-				.distinct()
-				.toList();
-
-        log.info("Before call users microservice");
-        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
-        Map<String, UserResponse> users = circuitBreaker.run(
-                () -> webClient.build()
-//                        .mutate().baseUrl("http://localhost:8080/users")
-				        .mutate().baseUrl(env.getProperty("user_service.url"))
-                        .build()
-                        .get()
-                        .uri(uriBuilder -> uriBuilder
-                                .path("")
-                                .queryParam("userIds", userIds)
-                                .build())
-                        .header(HttpHeaders.AUTHORIZATION, token)
-                        .retrieve()
-                        .bodyToMono(new ParameterizedTypeReference<Map<String, UserResponse>>() {})
-                        .block(),
-                throwable -> new HashMap<>());
-        log.info("After called users microservice");
-        return users;
-    }
-
-    @Override
     public List<FreeBoardAnswerResponse> getAnswers(String token, FreeBoard freeBoard) {
 
         log.info("Before call users microservice");

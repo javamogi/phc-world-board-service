@@ -4,6 +4,7 @@ import com.phcworld.phcworldboardservice.controller.port.FreeBoardResponse;
 import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearch;
 import com.phcworld.phcworldboardservice.domain.Authority;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
+import com.phcworld.phcworldboardservice.domain.User;
 import com.phcworld.phcworldboardservice.domain.port.FreeBoardRequest;
 import com.phcworld.phcworldboardservice.exception.model.DeletedEntityException;
 import com.phcworld.phcworldboardservice.exception.model.ForbiddenException;
@@ -39,6 +40,10 @@ class FreeBoardApiControllerTest {
                 .title("제목")
                 .contents("내용")
                 .build();
+        testContainer.userRepository.save(User.builder()
+                        .userId("1111")
+                        .name("일일일일")
+                .build());
         Authentication authentication = new FakeAuthentication("1111", "test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -50,6 +55,7 @@ class FreeBoardApiControllerTest {
         assertThat(result.getBody()).isNotNull();
         assertThat(result.getBody().title()).isEqualTo("제목");
         assertThat(result.getBody().contents()).isEqualTo("내용");
+        assertThat(result.getBody().writer().getName()).isEqualTo("일일일일");
         assertThat(result.getBody().count()).isZero();
         assertThat(result.getBody().countOfAnswer()).isZero();
         assertThat(result.getBody().createDate()).isEqualTo(LocalDateTimeUtils.getTime(time));
@@ -64,7 +70,11 @@ class FreeBoardApiControllerTest {
         TestContainer testContainer = TestContainer.builder()
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
-        String userId1 = "1111";
+        User user = User.builder()
+                .userId("1111")
+                .name("일일일일")
+                .profileImage("blank.jpg")
+                .build();
 
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
@@ -72,7 +82,7 @@ class FreeBoardApiControllerTest {
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId(userId1)
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
@@ -83,7 +93,7 @@ class FreeBoardApiControllerTest {
                 .contents("잘부탁드립니다")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId(userId1)
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
@@ -112,14 +122,18 @@ class FreeBoardApiControllerTest {
         TestContainer testContainer = TestContainer.builder()
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
-        String userId = "1111";
+        User user = User.builder()
+                .userId("1111")
+                .name("일일일일")
+                .profileImage("blank.jpg")
+                .build();
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId(userId)
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
@@ -130,7 +144,7 @@ class FreeBoardApiControllerTest {
                 .contents("잘부탁드립니다")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId(userId)
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
@@ -160,13 +174,23 @@ class FreeBoardApiControllerTest {
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
         String userId = "1111";
+        String userName = "일일일일";
+        User user = User.builder()
+                .userId(userId)
+                .name(userName)
+                .profileImage("blank.jpg")
+                .build();
+        testContainer.userRepository.save(User.builder()
+                        .userId(userId)
+                        .name(userName)
+                .build());
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId(userId)
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
@@ -188,7 +212,7 @@ class FreeBoardApiControllerTest {
         assertThat(result.getBody().isNew()).isTrue();
         assertThat(result.getBody().countOfAnswer()).isZero();
         assertThat(result.getBody().createDate()).isEqualTo(LocalDateTimeUtils.getTime(time));
-        assertThat(result.getBody().writer().email()).isEqualTo("test0@test.test");
+        assertThat(result.getBody().writer().getName()).isEqualTo("일일일일");
     }
 
     @Test
@@ -219,20 +243,24 @@ class FreeBoardApiControllerTest {
         TestContainer testContainer = TestContainer.builder()
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
-        String userId = "1111";
+        User user = User.builder()
+                .userId("1111")
+                .name("일일일일")
+                .profileImage("blank.jpg")
+                .build();
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId(userId)
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(true)
                 .build());
         long id = 1;
-        Authentication authentication = new FakeAuthentication(userId,"test", Authority.ROLE_USER).getAuthentication();
+        Authentication authentication = new FakeAuthentication(user.getUserId(),"test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // when
@@ -251,13 +279,23 @@ class FreeBoardApiControllerTest {
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
         String userId = "1111";
+        String userName = "일일일일";
+        User user = User.builder()
+                .userId(userId)
+                .name(userName)
+                .profileImage("blank.jpg")
+                .build();
+        testContainer.userRepository.save(User.builder()
+                        .userId(userId)
+                        .name(userName)
+                .build());
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId(userId)
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
@@ -283,7 +321,7 @@ class FreeBoardApiControllerTest {
         assertThat(result.getBody().isNew()).isTrue();
         assertThat(result.getBody().countOfAnswer()).isZero();
         assertThat(result.getBody().createDate()).isEqualTo(LocalDateTimeUtils.getTime(time));
-        assertThat(result.getBody().writer().email()).isEqualTo("test0@test.test");
+        assertThat(result.getBody().writer().getName()).isEqualTo("일일일일");
     }
 
     @Test
@@ -318,14 +356,18 @@ class FreeBoardApiControllerTest {
         TestContainer testContainer = TestContainer.builder()
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
-        String userId = "1111";
+        User user = User.builder()
+                .userId("1111")
+                .name("일일일일")
+                .profileImage("blank.jpg")
+                .build();
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId(userId)
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(true)
@@ -335,7 +377,7 @@ class FreeBoardApiControllerTest {
                 .title("제목수정")
                 .contents("내용수정")
                 .build();
-        Authentication authentication = new FakeAuthentication(userId,"test", Authority.ROLE_USER).getAuthentication();
+        Authentication authentication = new FakeAuthentication("1111","test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // when
@@ -353,14 +395,18 @@ class FreeBoardApiControllerTest {
         TestContainer testContainer = TestContainer.builder()
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
-        String userId = "1111";
+        User user = User.builder()
+                .userId("1111")
+                .name("일일일일")
+                .profileImage("blank.jpg")
+                .build();
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId(userId)
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
@@ -388,19 +434,23 @@ class FreeBoardApiControllerTest {
         TestContainer testContainer = TestContainer.builder()
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
-        String userId = "1111";
+        User user = User.builder()
+                .userId("1111")
+                .name("일일일일")
+                .profileImage("blank.jpg")
+                .build();
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId(userId)
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
                 .build());
-        Authentication authentication = new FakeAuthentication(userId, "test", Authority.ROLE_USER).getAuthentication();
+        Authentication authentication = new FakeAuthentication("1111", "test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
         long boardId = 1;
 
@@ -421,13 +471,18 @@ class FreeBoardApiControllerTest {
         TestContainer testContainer = TestContainer.builder()
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
+        User user = User.builder()
+                .userId("1111")
+                .name("일일일일")
+                .profileImage("blank.jpg")
+                .build();
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId("1111")
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
@@ -471,19 +526,23 @@ class FreeBoardApiControllerTest {
         TestContainer testContainer = TestContainer.builder()
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
-        String userId = "1111";
+        User user = User.builder()
+                .userId("1111")
+                .name("일일일일")
+                .profileImage("blank.jpg")
+                .build();
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId(userId)
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(true)
                 .build());
-        Authentication authentication = new FakeAuthentication(userId, "test", Authority.ROLE_ADMIN).getAuthentication();
+        Authentication authentication = new FakeAuthentication("1111", "test", Authority.ROLE_ADMIN).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // when
@@ -501,13 +560,18 @@ class FreeBoardApiControllerTest {
         TestContainer testContainer = TestContainer.builder()
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
+        User user = User.builder()
+                .userId("1111")
+                .name("일일일일")
+                .profileImage("blank.jpg")
+                .build();
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId("1111")
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
@@ -530,7 +594,12 @@ class FreeBoardApiControllerTest {
         TestContainer testContainer = TestContainer.builder()
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
-        String userId = "1111";
+        User user = User.builder()
+                .userId("1111")
+                .name("일일일일")
+                .profileImage("blank.jpg")
+                .build();
+        testContainer.userRepository.save(user);
 
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
@@ -538,7 +607,7 @@ class FreeBoardApiControllerTest {
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId(userId)
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
@@ -549,16 +618,16 @@ class FreeBoardApiControllerTest {
                 .contents("잘부탁드립니다")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId(userId)
+                .writer(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
                 .build());
-        Authentication authentication = new FakeAuthentication(userId,"test", Authority.ROLE_USER).getAuthentication();
+        Authentication authentication = new FakeAuthentication("1111","test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // when
-        ResponseEntity<List<FreeBoardResponse>> result = testContainer.freeBoardApiController.getFreeBoardsByUser(userId);
+        ResponseEntity<List<FreeBoardResponse>> result = testContainer.freeBoardApiController.getFreeBoardsByUser("1111");
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(200));

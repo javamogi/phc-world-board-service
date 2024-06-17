@@ -4,6 +4,7 @@ import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearch;
 import com.phcworld.phcworldboardservice.controller.port.FreeBoardService;
 import com.phcworld.phcworldboardservice.domain.Authority;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
+import com.phcworld.phcworldboardservice.domain.User;
 import com.phcworld.phcworldboardservice.domain.port.FreeBoardRequest;
 import com.phcworld.phcworldboardservice.exception.model.DeletedEntityException;
 import com.phcworld.phcworldboardservice.exception.model.ForbiddenException;
@@ -12,6 +13,7 @@ import com.phcworld.phcworldboardservice.security.utils.SecurityUtil;
 import com.phcworld.phcworldboardservice.service.port.FreeBoardRepository;
 import com.phcworld.phcworldboardservice.service.port.KafkaProducer;
 import com.phcworld.phcworldboardservice.service.port.LocalDateTimeHolder;
+import com.phcworld.phcworldboardservice.service.port.UserRepository;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,13 +35,18 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 
 	private final LocalDateTimeHolder localDateTimeHolder;
 
+	private final UserRepository userRepository;
+
 	@Override
 	public FreeBoard register(FreeBoardRequest request) {
 		String userId = SecurityUtil.getCurrentMemberId();
 
 //		String contents = uploadFileService.registerImages(request.contents());
 
-		FreeBoard freeBoard = FreeBoard.from(request, userId, localDateTimeHolder);
+		User user = userRepository.findById(userId)
+				.orElseThrow(NotFoundException::new);
+
+		FreeBoard freeBoard = FreeBoard.from(request, user, localDateTimeHolder);
 
 		return boardProducer.send("boards", freeBoard, false);
 //		return freeBoardRepository.save(freeBoard);
@@ -117,7 +124,9 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 
 	@Override
 	public List<FreeBoard> getFreeBoardsByUserId(String writerId) {
-		return freeBoardRepository.findByWriterId(writerId);
+		User user = userRepository.findById(writerId)
+				.orElseThrow(NotFoundException::new);
+		return freeBoardRepository.findByWriter(user);
 	}
 
 }

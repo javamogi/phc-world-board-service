@@ -1,6 +1,7 @@
 package com.phcworld.phcworldboardservice.infrastructure.port;
 
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
+import com.phcworld.phcworldboardservice.domain.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,8 @@ public class FreeBoardSelectDto {
 //    private String boardId;
     private Long boardId;
     private String writerId;
+    private String writerName;
+    private String profileImage;
     private String title;
     private String contents;
     private LocalDateTime createDate;
@@ -26,7 +29,11 @@ public class FreeBoardSelectDto {
     public FreeBoard toModel() {
         return FreeBoard.builder()
                 .id(boardId)
-                .writerId(writerId)
+                .writer(User.builder()
+                        .userId(writerId)
+                        .name(writerName)
+                        .profileImage(profileImage)
+                        .build())
                 .title(title)
                 .contents(contents)
                 .createDate(createDate)

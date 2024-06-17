@@ -36,28 +36,17 @@ public class FreeBoardApiController {
     public ResponseEntity<FreeBoardResponse> registerBoard(@RequestBody FreeBoardRequest requestDto,
                                                            @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
         FreeBoard freeBoard = freeBoardService.register(requestDto);
-        UserResponse user = webclientService.getUser(token, freeBoard);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(FreeBoardResponse.of(user, freeBoard));
+                .body(FreeBoardResponse.of(freeBoard));
     }
 
     @GetMapping("")
     public ResponseEntity<List<FreeBoardResponse>> getList(FreeBoardSearch search,
                                                            @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
         List<FreeBoard> freeBoards = freeBoardService.getSearchList(search);
-        Map<String, UserResponse> users = webclientService.getUsers(token, freeBoards);
         List<FreeBoardResponse> result = freeBoards.stream()
-				.map(f -> {
-					return FreeBoardResponse.builder()
-							.boardId(f.getId())
-							.title(f.getTitle())
-							.contents(f.getContents())
-							.writer(users != null ? users.get(f.getWriterId()) : null)
-							.count(f.getCount())
-							.countOfAnswer(f.getCountOfAnswer())
-							.build();
-				})
+				.map(FreeBoardResponse::of)
 				.toList();
         return ResponseEntity
                 .ok()
@@ -72,11 +61,10 @@ public class FreeBoardApiController {
     public ResponseEntity<FreeBoardResponse> getFreeBoard(@PathVariable(name = "freeBoardId") Long freeBoardId,
                                                           @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
         FreeBoard freeBoard = freeBoardService.getFreeBoard(freeBoardId);
-        UserResponse user = webclientService.getUser(token, freeBoard);
         List<FreeBoardAnswerResponse> answers = webclientService.getAnswers(token, freeBoard);
         return ResponseEntity
                 .ok()
-                .body(FreeBoardResponse.of(user, freeBoard, answers));
+                .body(FreeBoardResponse.of(freeBoard, answers));
     }
 
     @ApiResponses(value = {
@@ -88,10 +76,9 @@ public class FreeBoardApiController {
     public ResponseEntity<FreeBoardResponse> updateBoard(@RequestBody FreeBoardRequest requestDto,
                                                          @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
         FreeBoard freeBoard = freeBoardService.update(requestDto);
-        UserResponse user = webclientService.getUser(token, freeBoard);
         return ResponseEntity
                 .ok()
-                .body(FreeBoardResponse.of(user, freeBoard));
+                .body(FreeBoardResponse.of(freeBoard));
     }
 
     @ApiResponses(value = {
@@ -103,10 +90,9 @@ public class FreeBoardApiController {
     public ResponseEntity<FreeBoardResponse> deleteBoard(@PathVariable(name = "boardId") Long boardId,
                                                          @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
         FreeBoard freeBoard = freeBoardService.delete(boardId);
-        UserResponse user = webclientService.getUser(token, freeBoard);
         return ResponseEntity
                 .ok()
-                .body(FreeBoardResponse.of(user, freeBoard));
+                .body(FreeBoardResponse.of(freeBoard));
     }
 
     @GetMapping("/users/{userId}")

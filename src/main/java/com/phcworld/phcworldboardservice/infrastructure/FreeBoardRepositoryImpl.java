@@ -2,6 +2,7 @@ package com.phcworld.phcworldboardservice.infrastructure;
 
 import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearch;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
+import com.phcworld.phcworldboardservice.domain.User;
 import com.phcworld.phcworldboardservice.infrastructure.port.FreeBoardSelectDto;
 import com.phcworld.phcworldboardservice.service.port.FreeBoardRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +19,8 @@ public class FreeBoardRepositoryImpl implements FreeBoardRepository {
     private final FreeBoardJpaRepository freeBoardJpaRepository;
 
     @Override
-    public List<FreeBoard> findByWriterId(String writerId) {
-        return freeBoardJpaRepository.findByWriterId(writerId)
+    public List<FreeBoard> findByWriter(User writer) {
+        return freeBoardJpaRepository.findByWriter(writer)
                 .stream()
                 .map(FreeBoardEntity::toModel)
                 .toList();

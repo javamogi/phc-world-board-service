@@ -3,14 +3,12 @@ package com.phcworld.phcworldboardservice.service;
 import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearch;
 import com.phcworld.phcworldboardservice.domain.Authority;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
+import com.phcworld.phcworldboardservice.domain.User;
 import com.phcworld.phcworldboardservice.domain.port.FreeBoardRequest;
 import com.phcworld.phcworldboardservice.exception.model.DeletedEntityException;
 import com.phcworld.phcworldboardservice.exception.model.ForbiddenException;
 import com.phcworld.phcworldboardservice.exception.model.NotFoundException;
-import com.phcworld.phcworldboardservice.mock.FakeAuthentication;
-import com.phcworld.phcworldboardservice.mock.FakeFreeBoardRepository;
-import com.phcworld.phcworldboardservice.mock.FakeKafkaProducer;
-import com.phcworld.phcworldboardservice.mock.FakeLocalDateTimeHolder;
+import com.phcworld.phcworldboardservice.mock.*;
 import com.phcworld.phcworldboardservice.service.port.LocalDateTimeHolder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,14 +30,27 @@ class FreeBoardServiceImplTest {
     void init(){
         LocalDateTime time = LocalDateTime.of(2024, 6, 14, 11, 11, 11, 111111);
         FakeFreeBoardRepository fakeFreeBoardRepository = new FakeFreeBoardRepository();
+        FakeUserRepository fakeUserRepository = new FakeUserRepository();
         LocalDateTimeHolder localDateTimeHolder = new FakeLocalDateTimeHolder(time);
         this.freeBoardService = FreeBoardServiceImpl.builder()
                 .freeBoardRepository(fakeFreeBoardRepository)
+                .userRepository(fakeUserRepository)
                 .boardProducer(new FakeKafkaProducer())
                 .localDateTimeHolder(localDateTimeHolder)
                 .build();
-        String userId1 = "1111";
-        String userId2 = "2222";
+        User user1 = User.builder()
+                .userId("1111")
+                .profileImage("blank.jpg")
+                .name("일일일일")
+                .build();
+        User user2 = User.builder()
+                .userId("2222")
+                .profileImage("blank.jpg")
+                .name("이이이이")
+                .build();
+
+        fakeUserRepository.save(user1);
+        fakeUserRepository.save(user2);
 
         fakeFreeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
@@ -47,7 +58,7 @@ class FreeBoardServiceImplTest {
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId(userId1)
+                .writer(user1)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleteAuthority(true)
@@ -61,7 +72,7 @@ class FreeBoardServiceImplTest {
                 .contents("내용2")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId(userId1)
+                .writer(user1)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleteAuthority(false)
@@ -75,7 +86,7 @@ class FreeBoardServiceImplTest {
                 .contents("잘부탁드립니다.")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId(userId1)
+                .writer(user1)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleteAuthority(true)
@@ -88,7 +99,7 @@ class FreeBoardServiceImplTest {
                 .contents("삭제테스트를위한데이터")
                 .countOfAnswer(0)
                 .count(0)
-                .writerId(userId2)
+                .writer(user2)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleteAuthority(false)
@@ -117,7 +128,25 @@ class FreeBoardServiceImplTest {
         assertThat(result.getCount()).isZero();
         assertThat(result.getCountOfAnswer()).isZero();
         assertThat(result.isDeleted()).isFalse();
-        assertThat(result.getWriterId()).isEqualTo("1111");
+        assertThat(result.getWriter().getUserId()).isEqualTo("1111");
+    }
+
+    @Test
+    @DisplayName("Token으로 받은 회원 아이디가 존재하지 않다면 게시글을 등록할 수 없다.")
+    void failedRegisterWhenNotFoundUser(){
+        // given
+        FreeBoardRequest request = FreeBoardRequest.builder()
+                .title("제목")
+                .contents("내용")
+                .build();
+        Authentication authentication = new FakeAuthentication("3333", "test", Authority.ROLE_USER).getAuthentication();
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // when
+        // then
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            freeBoardService.register(request);
+        });
     }
 
     @Test
@@ -178,7 +207,7 @@ class FreeBoardServiceImplTest {
         assertThat(result.getTitle()).isEqualTo("제목");
         assertThat(result.getContents()).isEqualTo("내용");
         assertThat(result.getCount()).isEqualTo(1);
-        assertThat(result.getWriterId()).isEqualTo("1111");
+        assertThat(result.getWriter().getUserId()).isEqualTo("1111");
         assertThat(result.getCreateDate()).isEqualTo(LocalDateTime.of(2024, 6, 14, 11, 11, 11, 111111));
         assertThat(result.getIsModifyAuthority()).isTrue();
         assertThat(result.getIsDeleteAuthority()).isTrue();
@@ -231,7 +260,7 @@ class FreeBoardServiceImplTest {
         assertThat(result.getTitle()).isEqualTo("제목수정");
         assertThat(result.getContents()).isEqualTo("내용수정");
         assertThat(result.getCount()).isZero();
-        assertThat(result.getWriterId()).isEqualTo("1111");
+        assertThat(result.getWriter().getUserId()).isEqualTo("1111");
     }
 
     @Test
@@ -303,7 +332,7 @@ class FreeBoardServiceImplTest {
         assertThat(result.getId()).isEqualTo(1);
         assertThat(result.getTitle()).isEqualTo("제목");
         assertThat(result.getContents()).isEqualTo("내용");
-        assertThat(result.getWriterId()).isEqualTo("1111");
+        assertThat(result.getWriter().getUserId()).isEqualTo("1111");
         assertThat(result.isDeleted()).isTrue();
     }
 
@@ -323,7 +352,7 @@ class FreeBoardServiceImplTest {
         assertThat(result.getId()).isEqualTo(1);
         assertThat(result.getTitle()).isEqualTo("제목");
         assertThat(result.getContents()).isEqualTo("내용");
-        assertThat(result.getWriterId()).isEqualTo("1111");
+        assertThat(result.getWriter().getUserId()).isEqualTo("1111");
         assertThat(result.isDeleted()).isTrue();
     }
 

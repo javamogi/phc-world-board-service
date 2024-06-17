@@ -2,6 +2,7 @@ package com.phcworld.phcworldboardservice.infrastructure;
 
 import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearch;
 import com.phcworld.phcworldboardservice.infrastructure.port.FreeBoardSelectDto;
+import com.phcworld.phcworldboardservice.infrastructure.user.QUserEntity;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -22,6 +23,7 @@ import java.util.Objects;
 public class FreeBoardJpaRepositoryCustomImpl implements FreeBoardJpaRepositoryCustom {
     private final JPAQueryFactory queryFactory;
     QFreeBoardEntity freeBoard = QFreeBoardEntity.freeBoardEntity;
+    QUserEntity user = QUserEntity.userEntity;
 //    QFreeBoardAnswer answer = QFreeBoardAnswer.freeBoardAnswer;
 
     @Override
@@ -34,6 +36,7 @@ public class FreeBoardJpaRepositoryCustomImpl implements FreeBoardJpaRepositoryC
                 .where(
                         findByTitle(searchDto),
                         findContents(searchDto),
+                        findByWriterName(searchDto),
                         freeBoard.isDeleted.isFalse())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -43,7 +46,9 @@ public class FreeBoardJpaRepositoryCustomImpl implements FreeBoardJpaRepositoryC
         return queryFactory
                 .select(Projections.fields(FreeBoardSelectDto.class,
                         freeBoard.id.as("boardId"),
-                        freeBoard.writerId,
+                        user.userId.as("writerId"),
+                        user.name.as("writerName"),
+                        user.profileImage,
                         freeBoard.title,
                         freeBoard.contents,
                         freeBoard.createDate,
@@ -57,6 +62,7 @@ public class FreeBoardJpaRepositoryCustomImpl implements FreeBoardJpaRepositoryC
 //                                        .from(answer)
 //                                        .where(answer.freeBoard.eq(freeBoard)), "countOfAnswer")))
                 .from(freeBoard)
+                .join(user).on(user.userId.eq(freeBoard.writer.userId))
 //                .leftJoin(freeBoard.writer, user)
                 .where(freeBoard.id.in(ids))
                 .orderBy(orders.toArray(OrderSpecifier[]::new))
@@ -80,6 +86,15 @@ public class FreeBoardJpaRepositoryCustomImpl implements FreeBoardJpaRepositoryC
             return null;
         }
         return booleanBuilder.or(freeBoard.contents.contains(searchDto.keyword()));
+    }
+
+    private BooleanExpression findByWriterName(FreeBoardSearch searchDto){
+        if(Objects.isNull(searchDto.searchType())
+                || searchDto.keyword().isEmpty()
+                || !searchDto.searchType().equals(3)){
+            return null;
+        }
+        return user.name.eq(searchDto.keyword());
     }
 
     private List<OrderSpecifier> getOrderSpecifier(Pageable pageable){

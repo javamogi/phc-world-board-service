@@ -2,6 +2,7 @@ package com.phcworld.phcworldboardservice.messagequeue.consumer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
 import com.phcworld.phcworldboardservice.exception.model.InternalServerErrorException;
@@ -19,18 +20,39 @@ import java.util.Map;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class KafkaConsumerImpl implements KafkaConsumer {
+public class AnswerConsumerImpl {
     private final FreeBoardRepository repository;
     private final ObjectMapper mapper;
 
-    @KafkaListener(topics = "board-topic")
+//    @KafkaListener(topics = "board-topic")
+//    @Transactional
+//    public void updateCountOfAnswer(String kafkaMessage){
+//        log.info("kafka message : -> {}", kafkaMessage);
+//
+//        Map<Object, Object> map = new HashMap<>();
+//        try {
+//            map = mapper.readValue(kafkaMessage, new TypeReference<Map<Object, Object>>() {});
+//        } catch (JsonProcessingException e){
+//            throw new InternalServerErrorException();
+//        }
+//
+//        Long boardId = (Long) map.get("id");
+//        FreeBoard freeBoard = repository.findById(boardId)
+//                .orElseThrow(NotFoundException::new);
+//        freeBoard.addCountOfAnswer();
+//        repository.save(freeBoard);
+//    }
+
+    @KafkaListener(topics = "answers")
     @Transactional
     public void updateCountOfAnswer(String kafkaMessage){
         log.info("kafka message : -> {}", kafkaMessage);
 
         Map<Object, Object> map = new HashMap<>();
         try {
-            map = mapper.readValue(kafkaMessage, new TypeReference<Map<Object, Object>>() {});
+            JsonNode rootNode = mapper.readTree(kafkaMessage);
+            JsonNode payloadNode = rootNode.get("payload");
+            map = mapper.convertValue(payloadNode, new TypeReference<Map<Object, Object>>() {});
         } catch (JsonProcessingException e){
             throw new InternalServerErrorException();
         }
