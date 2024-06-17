@@ -61,7 +61,7 @@ public class FreeBoard {
                 .updateDate(updateDate)
                 .count(count + 1)
                 .countOfAnswer(countOfAnswer)
-                .isDeleted(false)
+                .isDeleted(isDeleted)
                 .isDeleteAuthority(isDeleteAuthority)
                 .isModifyAuthority(isModifyAuthority)
                 .build();
@@ -77,7 +77,7 @@ public class FreeBoard {
                 .updateDate(updateDate)
                 .count(count)
                 .countOfAnswer(countOfAnswer)
-                .isDeleted(false)
+                .isDeleted(isDeleted)
                 .build();
     }
 
@@ -116,7 +116,7 @@ public class FreeBoard {
                 .updateDate(updateDate)
                 .count(count)
                 .countOfAnswer(countOfAnswer)
-                .isDeleted(false)
+                .isDeleted(isDeleted)
                 .isDeleteAuthority(isDeleteAuthority)
                 .isModifyAuthority(isModifyAuthority)
                 .build();
@@ -132,7 +132,7 @@ public class FreeBoard {
                 .updateDate(updateDate)
                 .count(count)
                 .countOfAnswer(countOfAnswer + 1)
-                .isDeleted(true)
+                .isDeleted(isDeleted)
                 .build();
     }
 }

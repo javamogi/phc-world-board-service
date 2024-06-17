@@ -24,25 +24,6 @@ public class AnswerConsumerImpl {
     private final FreeBoardRepository repository;
     private final ObjectMapper mapper;
 
-//    @KafkaListener(topics = "board-topic")
-//    @Transactional
-//    public void updateCountOfAnswer(String kafkaMessage){
-//        log.info("kafka message : -> {}", kafkaMessage);
-//
-//        Map<Object, Object> map = new HashMap<>();
-//        try {
-//            map = mapper.readValue(kafkaMessage, new TypeReference<Map<Object, Object>>() {});
-//        } catch (JsonProcessingException e){
-//            throw new InternalServerErrorException();
-//        }
-//
-//        Long boardId = (Long) map.get("id");
-//        FreeBoard freeBoard = repository.findById(boardId)
-//                .orElseThrow(NotFoundException::new);
-//        freeBoard.addCountOfAnswer();
-//        repository.save(freeBoard);
-//    }
-
     @KafkaListener(topics = "answers")
     @Transactional
     public void updateCountOfAnswer(String kafkaMessage){
@@ -57,10 +38,10 @@ public class AnswerConsumerImpl {
             throw new InternalServerErrorException();
         }
 
-        Long boardId = (Long) map.get("id");
+        Long boardId = (long) (int) map.get("free_board_id");
         FreeBoard freeBoard = repository.findById(boardId)
                 .orElseThrow(NotFoundException::new);
-        freeBoard.addCountOfAnswer();
+        freeBoard = freeBoard.addCountOfAnswer();
         repository.save(freeBoard);
     }
 }

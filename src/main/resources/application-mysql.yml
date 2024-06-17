@@ -23,7 +23,6 @@ spring:
       hibernate.default_batch_fetch_size: 1000
       hibernate:
         format_sql: true
-
 eureka:
   client:
     enabled: false
