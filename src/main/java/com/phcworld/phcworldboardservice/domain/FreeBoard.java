@@ -67,14 +67,14 @@ public class FreeBoard {
                 .build();
     }
 
-    public FreeBoard update(String title, String contents) {
+    public FreeBoard update(String title, String contents, LocalDateTimeHolder timeHolder) {
         return FreeBoard.builder()
                 .id(id)
                 .writer(writer)
                 .title(title)
                 .contents(contents)
                 .createDate(createDate)
-                .updateDate(updateDate)
+                .updateDate(timeHolder.now())
                 .count(count)
                 .countOfAnswer(countOfAnswer)
                 .isDeleted(isDeleted)

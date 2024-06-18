@@ -157,7 +157,7 @@ class FreeBoardTest {
                 .build();
 
         // when
-        FreeBoard result = freeBoard.update("수정된 제목", "수정된 내용");
+        FreeBoard result = freeBoard.update("수정된 제목", "수정된 내용", new FakeLocalDateTimeHolder(time));
 
         // then
         assertThat(result.getTitle()).isEqualTo("수정된 제목");

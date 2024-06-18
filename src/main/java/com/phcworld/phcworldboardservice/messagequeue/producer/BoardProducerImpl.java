@@ -31,7 +31,7 @@ public class BoardProducerImpl implements KafkaProducer {
                 .is_deleted((byte)(Boolean.TRUE.equals(board.isDeleted()) ? 1 : 0))
                 .title(board.getTitle())
                 .contents(board.getContents())
-                .update_date(LocalDateTime.now().withNano(0).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")))
+                .update_date(board.getUpdateDate().withNano(0).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")))
                 .count(board.getCount())
                 .count_of_answer(board.getCountOfAnswer())
                 .build();

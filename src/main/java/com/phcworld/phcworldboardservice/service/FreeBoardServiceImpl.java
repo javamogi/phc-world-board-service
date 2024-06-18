@@ -99,7 +99,7 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 //		String contents = uploadFileService.registerImages(request.contents());
 
 //		freeBoard.update(request.title(), contents);
-		freeBoard = freeBoard.update(request.title(), request.contents());
+		freeBoard = freeBoard.update(request.title(), request.contents(), localDateTimeHolder);
 		return boardProducer.send("boards", freeBoard, true);
 
 //		return freeBoardRepository.save(freeBoard);
@@ -127,6 +127,11 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 		User user = userRepository.findById(writerId)
 				.orElseThrow(NotFoundException::new);
 		return freeBoardRepository.findByWriter(user);
+	}
+
+	@Override
+	public boolean existBoard(Long boardId){
+		return freeBoardRepository.findById(boardId).isPresent();
 	}
 
 }

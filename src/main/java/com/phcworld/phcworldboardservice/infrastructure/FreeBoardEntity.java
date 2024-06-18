@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 @Builder
 @Accessors(chain = true)
 @EntityListeners(AuditingEntityListener.class)
-@DynamicUpdate
+//@DynamicUpdate
 @DynamicInsert
 @Table(name = "boards",
 		indexes = {@Index(name = "idx__create_date", columnList = "createDate"),
