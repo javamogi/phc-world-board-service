@@ -410,18 +410,30 @@ class FreeBoardServiceImplTest {
     }
 
     @Test
-    @DisplayName("게시글 ID로 존재유무를 확인할 수 있다.")
+    @DisplayName("게시글 ID의 게시글이 존재할 경우 게시글 정보를 가져온다.")
     void existBoard(){
         // given
         Authentication authentication = new FakeAuthentication("1111", "test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // when
-        boolean result = freeBoardService.existBoard(1L);
-        boolean result2 = freeBoardService.existBoard(99L);
+        FreeBoard result = freeBoardService.existBoard(1L);
 
         // then
-        assertThat(result).isTrue();
-        assertThat(result2).isFalse();
+        assertThat(result).isNotNull();
+    }
+
+    @Test
+    @DisplayName("게시글이 존재하지 않을 경우 예외가 발생한다.")
+    void existBoardWhenNotFound(){
+        // given
+        Authentication authentication = new FakeAuthentication("1111", "test", Authority.ROLE_USER).getAuthentication();
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // when
+        // then
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            freeBoardService.existBoard(99L);
+        });
     }
 }

@@ -74,7 +74,7 @@ public class FreeBoardApiController {
             @ApiResponse(responseCode = "409", description = "삭제된 게시글")
     })
     @GetMapping("/{freeBoardId}")
-    public ResponseEntity<FreeBoardResponse> getFreeBoard(@PathVariable(name = "freeBoardId") Long freeBoardId,
+    public ResponseEntity<FreeBoardResponse> getFreeBoardWithAnswers(@PathVariable(name = "freeBoardId") Long freeBoardId,
                                                           @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
         FreeBoard freeBoard = freeBoardService.getFreeBoard(freeBoardId);
         UserResponse user = webclientService.getUser(token, freeBoard);
@@ -126,11 +126,11 @@ public class FreeBoardApiController {
     }
 
     @GetMapping("/{freeBoardId}/exist")
-    public ResponseEntity<Boolean> existFreeBoard(@PathVariable(name = "freeBoardId") Long freeBoardId){
-        Boolean result = freeBoardService.existBoard(freeBoardId);
+    public ResponseEntity<FreeBoardResponse> existFreeBoard(@PathVariable(name = "freeBoardId") Long freeBoardId){
+        FreeBoard result = freeBoardService.existBoard(freeBoardId);
         return ResponseEntity
                 .ok()
-                .body(result);
+                .body(FreeBoardResponse.of(result));
     }
 
 }

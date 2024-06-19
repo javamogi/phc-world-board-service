@@ -637,7 +637,7 @@ class FreeBoardApiControllerTest {
     }
 
     @Test
-    @DisplayName("게시글 ID로 존재유무를 응답받는다.")
+    @DisplayName("게시글 ID로 조회")
     void existBoard(){
         // given
         LocalDateTime time = LocalDateTime.now();
@@ -661,11 +661,36 @@ class FreeBoardApiControllerTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // when
-        ResponseEntity<Boolean> result = testContainer.freeBoardApiController.existFreeBoard(1L);
+        ResponseEntity<FreeBoardResponse> result = testContainer.freeBoardApiController.existFreeBoard(1L);
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(200));
-        assertThat(result.getBody()).isTrue();
+        assertThat(result.getBody()).isNotNull();
+        assertThat(result.getBody().boardId()).isEqualTo(1);
+        assertThat(result.getBody().title()).isEqualTo("제목");
+        assertThat(result.getBody().contents()).isEqualTo("내용");
+        assertThat(result.getBody().countOfAnswer()).isZero();
+        assertThat(result.getBody().count()).isZero();
+        assertThat(result.getBody().isDelete()).isFalse();
+    }
+
+    @Test
+    @DisplayName("게시글 ID로 조회 실패")
+    void failedExistBoardWhenNotFound(){
+        // given
+        LocalDateTime time = LocalDateTime.now();
+        TestContainer testContainer = TestContainer.builder()
+                .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
+                .build();
+
+        Authentication authentication = new FakeAuthentication("1111", "test", Authority.ROLE_USER).getAuthentication();
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // when
+        // then
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            testContainer.freeBoardApiController.existFreeBoard(1L);
+        });
     }
 
 }

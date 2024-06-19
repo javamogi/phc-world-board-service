@@ -121,8 +121,8 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 	}
 
 	@Override
-	public boolean existBoard(Long boardId){
-		return freeBoardRepository.findById(boardId).isPresent();
+	public FreeBoard existBoard(Long boardId){
+		return freeBoardRepository.findById(boardId).orElseThrow(NotFoundException::new);
 	}
 
 }
