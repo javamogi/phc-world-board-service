@@ -10,7 +10,6 @@ import com.phcworld.phcworldboardservice.service.port.FreeBoardAnswerResponse;
 import com.phcworld.phcworldboardservice.service.port.UserResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -33,21 +32,32 @@ public class FreeBoardApiController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<FreeBoardResponse> registerBoard(@RequestBody FreeBoardRequest requestDto,
-                                                           @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+    public ResponseEntity<FreeBoardResponse> register(@RequestBody FreeBoardRequest requestDto,
+                                                      @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+        UserResponse user = webclientService.getUser(token, null);
         FreeBoard freeBoard = freeBoardService.register(requestDto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(FreeBoardResponse.of(freeBoard));
+                .body(FreeBoardResponse.of(freeBoard, user));
     }
 
     @GetMapping("")
     public ResponseEntity<List<FreeBoardResponse>> getList(FreeBoardSearch search,
                                                            @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
         List<FreeBoard> freeBoards = freeBoardService.getSearchList(search);
+        Map<String, UserResponse> users = webclientService.getUsers(token, freeBoards);
         List<FreeBoardResponse> result = freeBoards.stream()
-				.map(FreeBoardResponse::of)
-				.toList();
+                .map(f -> {
+                    return FreeBoardResponse.builder()
+                            .boardId(f.getId())
+                            .title(f.getTitle())
+                            .contents(f.getContents())
+                            .writer(users != null ? users.get(f.getWriterId()) : null)
+                            .count(f.getCount())
+                            .countOfAnswer(f.getCountOfAnswer())
+                            .build();
+                })
+                .toList();
         return ResponseEntity
                 .ok()
                 .body(result);
@@ -61,10 +71,11 @@ public class FreeBoardApiController {
     public ResponseEntity<FreeBoardResponse> getFreeBoard(@PathVariable(name = "freeBoardId") Long freeBoardId,
                                                           @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
         FreeBoard freeBoard = freeBoardService.getFreeBoard(freeBoardId);
+        UserResponse user = webclientService.getUser(token, freeBoard);
         List<FreeBoardAnswerResponse> answers = webclientService.getAnswers(token, freeBoard);
         return ResponseEntity
                 .ok()
-                .body(FreeBoardResponse.of(freeBoard, answers));
+                .body(FreeBoardResponse.of(freeBoard, user, answers));
     }
 
     @ApiResponses(value = {
@@ -73,12 +84,13 @@ public class FreeBoardApiController {
             @ApiResponse(responseCode = "403", description = "수정 권한 없음")
     })
     @PatchMapping("")
-    public ResponseEntity<FreeBoardResponse> updateBoard(@RequestBody FreeBoardRequest requestDto,
-                                                         @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+    public ResponseEntity<FreeBoardResponse> update(@RequestBody FreeBoardRequest requestDto,
+                                                    @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
         FreeBoard freeBoard = freeBoardService.update(requestDto);
+        UserResponse user = webclientService.getUser(token, freeBoard);
         return ResponseEntity
                 .ok()
-                .body(FreeBoardResponse.of(freeBoard));
+                .body(FreeBoardResponse.of(freeBoard, user));
     }
 
     @ApiResponses(value = {
@@ -87,12 +99,13 @@ public class FreeBoardApiController {
             @ApiResponse(responseCode = "403", description = "삭제 권한 없음")
     })
     @DeleteMapping("/{boardId}")
-    public ResponseEntity<FreeBoardResponse> deleteBoard(@PathVariable(name = "boardId") Long boardId,
-                                                         @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+    public ResponseEntity<FreeBoardResponse> delete(@PathVariable(name = "boardId") Long boardId,
+                                                    @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
         FreeBoard freeBoard = freeBoardService.delete(boardId);
+        UserResponse user = webclientService.getUser(token, freeBoard);
         return ResponseEntity
                 .ok()
-                .body(FreeBoardResponse.of(freeBoard));
+                .body(FreeBoardResponse.of(freeBoard, user));
     }
 
     @GetMapping("/users/{userId}")
@@ -101,6 +114,14 @@ public class FreeBoardApiController {
                 .stream()
                 .map(FreeBoardResponse::of)
                 .toList();
+        return ResponseEntity
+                .ok()
+                .body(result);
+    }
+
+    @GetMapping("/{freeBoardId}/exist")
+    public ResponseEntity<Boolean> existFreeBoard(@PathVariable(name = "freeBoardId") Long freeBoardId){
+        Boolean result = freeBoardService.existBoard(freeBoardId);
         return ResponseEntity
                 .ok()
                 .body(result);

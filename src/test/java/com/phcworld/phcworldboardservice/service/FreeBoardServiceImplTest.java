@@ -30,27 +30,14 @@ class FreeBoardServiceImplTest {
     void init(){
         LocalDateTime time = LocalDateTime.of(2024, 6, 14, 11, 11, 11, 111111);
         FakeFreeBoardRepository fakeFreeBoardRepository = new FakeFreeBoardRepository();
-        FakeUserRepository fakeUserRepository = new FakeUserRepository();
         LocalDateTimeHolder localDateTimeHolder = new FakeLocalDateTimeHolder(time);
         this.freeBoardService = FreeBoardServiceImpl.builder()
                 .freeBoardRepository(fakeFreeBoardRepository)
-                .userRepository(fakeUserRepository)
                 .boardProducer(new FakeKafkaProducer())
                 .localDateTimeHolder(localDateTimeHolder)
                 .build();
-        User user1 = User.builder()
-                .userId("1111")
-                .profileImage("blank.jpg")
-                .name("일일일일")
-                .build();
-        User user2 = User.builder()
-                .userId("2222")
-                .profileImage("blank.jpg")
-                .name("이이이이")
-                .build();
-
-        fakeUserRepository.save(user1);
-        fakeUserRepository.save(user2);
+        String userId1 = "1111";
+        String userId2 = "2222";
 
         fakeFreeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
@@ -58,7 +45,7 @@ class FreeBoardServiceImplTest {
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writer(user1)
+                .writerId(userId1)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleteAuthority(true)
@@ -72,7 +59,7 @@ class FreeBoardServiceImplTest {
                 .contents("내용2")
                 .countOfAnswer(0)
                 .count(0)
-                .writer(user1)
+                .writerId(userId1)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleteAuthority(false)
@@ -86,7 +73,7 @@ class FreeBoardServiceImplTest {
                 .contents("잘부탁드립니다.")
                 .countOfAnswer(0)
                 .count(0)
-                .writer(user1)
+                .writerId(userId1)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleteAuthority(true)
@@ -99,7 +86,7 @@ class FreeBoardServiceImplTest {
                 .contents("삭제테스트를위한데이터")
                 .countOfAnswer(0)
                 .count(0)
-                .writer(user2)
+                .writerId(userId2)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleteAuthority(false)
@@ -128,25 +115,7 @@ class FreeBoardServiceImplTest {
         assertThat(result.getCount()).isZero();
         assertThat(result.getCountOfAnswer()).isZero();
         assertThat(result.isDeleted()).isFalse();
-        assertThat(result.getWriter().getUserId()).isEqualTo("1111");
-    }
-
-    @Test
-    @DisplayName("Token으로 받은 회원 아이디가 존재하지 않다면 게시글을 등록할 수 없다.")
-    void failedRegisterWhenNotFoundUser(){
-        // given
-        FreeBoardRequest request = FreeBoardRequest.builder()
-                .title("제목")
-                .contents("내용")
-                .build();
-        Authentication authentication = new FakeAuthentication("3333", "test", Authority.ROLE_USER).getAuthentication();
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        // when
-        // then
-        Assertions.assertThrows(NotFoundException.class, () -> {
-            freeBoardService.register(request);
-        });
+        assertThat(result.getWriterId()).isEqualTo("1111");
     }
 
     @Test
@@ -207,7 +176,7 @@ class FreeBoardServiceImplTest {
         assertThat(result.getTitle()).isEqualTo("제목");
         assertThat(result.getContents()).isEqualTo("내용");
         assertThat(result.getCount()).isEqualTo(1);
-        assertThat(result.getWriter().getUserId()).isEqualTo("1111");
+        assertThat(result.getWriterId()).isEqualTo("1111");
         assertThat(result.getCreateDate()).isEqualTo(LocalDateTime.of(2024, 6, 14, 11, 11, 11, 111111));
         assertThat(result.getIsModifyAuthority()).isTrue();
         assertThat(result.getIsDeleteAuthority()).isTrue();
@@ -260,7 +229,7 @@ class FreeBoardServiceImplTest {
         assertThat(result.getTitle()).isEqualTo("제목수정");
         assertThat(result.getContents()).isEqualTo("내용수정");
         assertThat(result.getCount()).isZero();
-        assertThat(result.getWriter().getUserId()).isEqualTo("1111");
+        assertThat(result.getWriterId()).isEqualTo("1111");
     }
 
     @Test
@@ -332,7 +301,7 @@ class FreeBoardServiceImplTest {
         assertThat(result.getId()).isEqualTo(1);
         assertThat(result.getTitle()).isEqualTo("제목");
         assertThat(result.getContents()).isEqualTo("내용");
-        assertThat(result.getWriter().getUserId()).isEqualTo("1111");
+        assertThat(result.getWriterId()).isEqualTo("1111");
         assertThat(result.isDeleted()).isTrue();
     }
 
@@ -352,7 +321,7 @@ class FreeBoardServiceImplTest {
         assertThat(result.getId()).isEqualTo(1);
         assertThat(result.getTitle()).isEqualTo("제목");
         assertThat(result.getContents()).isEqualTo("내용");
-        assertThat(result.getWriter().getUserId()).isEqualTo("1111");
+        assertThat(result.getWriterId()).isEqualTo("1111");
         assertThat(result.isDeleted()).isTrue();
     }
 
@@ -416,5 +385,21 @@ class FreeBoardServiceImplTest {
         assertThat(result.size()).isEqualTo(3);
         assertThat(result.get(0).getTitle()).isEqualTo("제목");
         assertThat(result.get(1).getTitle()).isEqualTo("제목2");
+    }
+
+    @Test
+    @DisplayName("게시글 ID로 존재유무를 확인할 수 있다.")
+    void existBoard(){
+        // given
+        Authentication authentication = new FakeAuthentication("1111", "test", Authority.ROLE_USER).getAuthentication();
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // when
+        boolean result = freeBoardService.existBoard(1L);
+        boolean result2 = freeBoardService.existBoard(99L);
+
+        // then
+        assertThat(result).isTrue();
+        assertThat(result2).isFalse();
     }
 }

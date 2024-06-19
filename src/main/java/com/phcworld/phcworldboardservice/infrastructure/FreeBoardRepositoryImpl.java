@@ -19,8 +19,8 @@ public class FreeBoardRepositoryImpl implements FreeBoardRepository {
     private final FreeBoardJpaRepository freeBoardJpaRepository;
 
     @Override
-    public List<FreeBoard> findByWriter(User writer) {
-        return freeBoardJpaRepository.findByWriter(writer)
+    public List<FreeBoard> findByWriterId(String writerId) {
+        return freeBoardJpaRepository.findByWriterId(writerId)
                 .stream()
                 .map(FreeBoardEntity::toModel)
                 .toList();

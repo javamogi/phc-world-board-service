@@ -2,17 +2,22 @@ package com.phcworld.phcworldboardservice.service;
 
 import com.phcworld.phcworldboardservice.controller.port.WebclientService;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
+import com.phcworld.phcworldboardservice.exception.model.NotFoundException;
+import com.phcworld.phcworldboardservice.security.utils.SecurityUtil;
 import com.phcworld.phcworldboardservice.service.port.FreeBoardAnswerResponse;
 import com.phcworld.phcworldboardservice.service.port.UserResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,8 +30,64 @@ import java.util.Map;
 public class WebclientServiceImpl implements WebclientService {
 
     private final WebClient.Builder webClient;
-    private final Environment env;
     private final CircuitBreakerFactory circuitBreakerFactory;
+
+    @Value("${user_service.url}")
+    private String userUrl;
+
+    @Value("${answer_service.url}")
+    private String answerUrl;
+
+    @Override
+    public UserResponse getUser(String token, FreeBoard board){
+        String userId = "";
+        if (board == null){
+            userId = SecurityUtil.getCurrentMemberId();
+        } else {
+            userId = board.getWriterId();
+        }
+        String finalUserId = userId;
+        return webClient.build()
+                .mutate().baseUrl(userUrl)
+                .build()
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("{userId}")
+                        .build(finalUserId))
+                .header(HttpHeaders.AUTHORIZATION, token)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.just(new NotFoundException()))
+                .bodyToMono(UserResponse.class)
+                .block();
+    }
+
+    @Override
+    public Map<String, UserResponse> getUsers(String token, List<FreeBoard> freeBoards) {
+
+        List<String> userIds = freeBoards.stream()
+                .map(FreeBoard::getWriterId)
+                .distinct()
+                .toList();
+
+        log.info("Before call users microservice");
+        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
+        Map<String, UserResponse> users = circuitBreaker.run(
+                () -> webClient.build()
+                        .mutate().baseUrl(userUrl)
+                        .build()
+                        .get()
+                        .uri(uriBuilder -> uriBuilder
+                                .path("")
+                                .queryParam("userIds", userIds)
+                                .build())
+                        .header(HttpHeaders.AUTHORIZATION, token)
+                        .retrieve()
+                        .bodyToMono(new ParameterizedTypeReference<Map<String, UserResponse>>() {})
+                        .block(),
+                throwable -> new HashMap<>());
+        log.info("After called users microservice");
+        return users;
+    }
 
     @Override
     public List<FreeBoardAnswerResponse> getAnswers(String token, FreeBoard freeBoard) {
@@ -35,8 +96,7 @@ public class WebclientServiceImpl implements WebclientService {
         CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
         List<FreeBoardAnswerResponse> answers = circuitBreaker.run(
                 () -> webClient.build()
-//                        .mutate().baseUrl("http://localhost:8080/answers")
-				        .mutate().baseUrl(env.getProperty("answer_service.url"))
+				        .mutate().baseUrl(answerUrl)
                         .build()
                         .get()
                         .uri(uriBuilder -> uriBuilder

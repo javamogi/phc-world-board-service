@@ -9,4 +9,7 @@ import java.util.Map;
 
 public interface WebclientService {
     List<FreeBoardAnswerResponse> getAnswers(String token, FreeBoard freeBoard);
+    UserResponse getUser(String token, FreeBoard freeBoard);
+
+    Map<String, UserResponse> getUsers(String token, List<FreeBoard> freeBoards);
 }

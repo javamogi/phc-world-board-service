@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FreeBoardJpaRepository extends JpaRepository<FreeBoardEntity, Long>, FreeBoardJpaRepositoryCustom {
-	List<FreeBoardEntity> findByWriter(User writer);
+	List<FreeBoardEntity> findByWriterId(String writerId);
 
 //	@Query("select f from FreeBoard f join fetch f.writer")
 //	List<FreeBoard> findAllByFetch();

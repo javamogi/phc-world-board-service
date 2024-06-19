@@ -16,8 +16,6 @@ public class FreeBoardSelectDto {
 //    private String boardId;
     private Long boardId;
     private String writerId;
-    private String writerName;
-    private String profileImage;
     private String title;
     private String contents;
     private LocalDateTime createDate;
@@ -29,11 +27,7 @@ public class FreeBoardSelectDto {
     public FreeBoard toModel() {
         return FreeBoard.builder()
                 .id(boardId)
-                .writer(User.builder()
-                        .userId(writerId)
-                        .name(writerName)
-                        .profileImage(profileImage)
-                        .build())
+                .writerId(writerId)
                 .title(title)
                 .contents(contents)
                 .createDate(createDate)
