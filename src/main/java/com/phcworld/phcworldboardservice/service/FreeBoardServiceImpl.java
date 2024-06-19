@@ -2,6 +2,7 @@ package com.phcworld.phcworldboardservice.service;
 
 import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearch;
 import com.phcworld.phcworldboardservice.controller.port.FreeBoardService;
+import com.phcworld.phcworldboardservice.controller.port.WebclientService;
 import com.phcworld.phcworldboardservice.domain.Authority;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
 import com.phcworld.phcworldboardservice.domain.User;
@@ -10,10 +11,7 @@ import com.phcworld.phcworldboardservice.exception.model.DeletedEntityException;
 import com.phcworld.phcworldboardservice.exception.model.ForbiddenException;
 import com.phcworld.phcworldboardservice.exception.model.NotFoundException;
 import com.phcworld.phcworldboardservice.security.utils.SecurityUtil;
-import com.phcworld.phcworldboardservice.service.port.FreeBoardRepository;
-import com.phcworld.phcworldboardservice.service.port.KafkaProducer;
-import com.phcworld.phcworldboardservice.service.port.LocalDateTimeHolder;
-import com.phcworld.phcworldboardservice.service.port.UserRepository;
+import com.phcworld.phcworldboardservice.service.port.*;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,10 +30,9 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 	private final FreeBoardRepository freeBoardRepository;
 //	private final UploadFileService uploadFileService;
 	private final KafkaProducer boardProducer;
-
 	private final LocalDateTimeHolder localDateTimeHolder;
 
-	private final UserRepository userRepository;
+	private final WebclientService webclientService;
 
 	@Override
 	public FreeBoard register(FreeBoardRequest request) {
@@ -43,10 +40,7 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 
 //		String contents = uploadFileService.registerImages(request.contents());
 
-		User user = userRepository.findById(userId)
-				.orElseThrow(NotFoundException::new);
-
-		FreeBoard freeBoard = FreeBoard.from(request, user, localDateTimeHolder);
+		FreeBoard freeBoard = FreeBoard.from(request, userId, localDateTimeHolder);
 
 		return boardProducer.send("boards", freeBoard, false);
 //		return freeBoardRepository.save(freeBoard);
@@ -124,9 +118,7 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 
 	@Override
 	public List<FreeBoard> getFreeBoardsByUserId(String writerId) {
-		User user = userRepository.findById(writerId)
-				.orElseThrow(NotFoundException::new);
-		return freeBoardRepository.findByWriter(user);
+		return freeBoardRepository.findByWriterId(writerId);
 	}
 
 	@Override

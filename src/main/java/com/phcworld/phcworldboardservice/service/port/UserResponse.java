@@ -1,13 +1,21 @@
 package com.phcworld.phcworldboardservice.service.port;
 
+import com.phcworld.phcworldboardservice.domain.User;
 import lombok.Builder;
 
 @Builder
 public record UserResponse(
-        String email,
+//        String email,
+//        String createDate,
         String name,
-        String createDate,
         String profileImage,
         String userId
 ) {
+    public static UserResponse of(User writer) {
+        return UserResponse.builder()
+                .name(writer.getName())
+                .profileImage(writer.getProfileImage())
+                .userId(writer.getUserId())
+                .build();
+    }
 }

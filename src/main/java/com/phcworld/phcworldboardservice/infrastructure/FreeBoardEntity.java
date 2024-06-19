@@ -1,7 +1,6 @@
 package com.phcworld.phcworldboardservice.infrastructure;
 
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
-import com.phcworld.phcworldboardservice.infrastructure.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -37,9 +35,8 @@ public class FreeBoardEntity {
 //	@Column(nullable = false, unique = true)
 //	private String boardId;
 
-//	@Column(nullable = false)
-	@ManyToOne
-	private UserEntity writer;
+	@Column(nullable = false)
+	private String writerId;
 
 	@Column(nullable = false)
 	private String title;
@@ -68,7 +65,7 @@ public class FreeBoardEntity {
 	public static FreeBoardEntity from(FreeBoard freeBoard) {
 		return FreeBoardEntity.builder()
 				.id(freeBoard.getId())
-				.writer(UserEntity.from(freeBoard.getWriter()))
+				.writerId(freeBoard.getWriterId())
 				.title(freeBoard.getTitle())
 				.contents(freeBoard.getContents())
 				.createDate(freeBoard.getCreateDate())
@@ -82,7 +79,7 @@ public class FreeBoardEntity {
 	public FreeBoard toModel() {
 		return FreeBoard.builder()
 				.id(id)
-				.writer(writer.toModel())
+				.writerId(writerId)
 				.title(title)
 				.contents(contents)
 				.createDate(createDate)

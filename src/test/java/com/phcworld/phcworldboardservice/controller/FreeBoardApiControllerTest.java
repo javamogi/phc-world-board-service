@@ -40,26 +40,43 @@ class FreeBoardApiControllerTest {
                 .title("제목")
                 .contents("내용")
                 .build();
-        testContainer.userRepository.save(User.builder()
-                        .userId("1111")
-                        .name("일일일일")
-                .build());
         Authentication authentication = new FakeAuthentication("1111", "test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // when
-        ResponseEntity<FreeBoardResponse> result = testContainer.freeBoardApiController.registerBoard(request, "token");
+        ResponseEntity<FreeBoardResponse> result = testContainer.freeBoardApiController.register(request, "1111");
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(201));
         assertThat(result.getBody()).isNotNull();
         assertThat(result.getBody().title()).isEqualTo("제목");
         assertThat(result.getBody().contents()).isEqualTo("내용");
-        assertThat(result.getBody().writer().getName()).isEqualTo("일일일일");
         assertThat(result.getBody().count()).isZero();
         assertThat(result.getBody().countOfAnswer()).isZero();
         assertThat(result.getBody().createDate()).isEqualTo(LocalDateTimeUtils.getTime(time));
         assertThat(result.getBody().isNew()).isTrue();
+    }
+
+    @Test
+    @DisplayName("가입하지 않은 회원은 게시글을 등록할 수 없다.")
+    void failedRegisterWhenNotFoundUser(){
+        // given
+        LocalDateTime time = LocalDateTime.now();
+        TestContainer testContainer = TestContainer.builder()
+                .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
+                .build();
+        FreeBoardRequest request = FreeBoardRequest.builder()
+                .title("제목")
+                .contents("내용")
+                .build();
+        Authentication authentication = new FakeAuthentication("9999", "test", Authority.ROLE_USER).getAuthentication();
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // when
+        // then
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            testContainer.freeBoardApiController.register(request, "9999");
+        });
     }
 
     @Test
@@ -70,11 +87,7 @@ class FreeBoardApiControllerTest {
         TestContainer testContainer = TestContainer.builder()
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
-        User user = User.builder()
-                .userId("1111")
-                .name("일일일일")
-                .profileImage("blank.jpg")
-                .build();
+        String user = "1111";
 
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
@@ -82,7 +95,7 @@ class FreeBoardApiControllerTest {
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writer(user)
+                .writerId(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
@@ -93,7 +106,7 @@ class FreeBoardApiControllerTest {
                 .contents("잘부탁드립니다")
                 .countOfAnswer(0)
                 .count(0)
-                .writer(user)
+                .writerId(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
@@ -122,18 +135,14 @@ class FreeBoardApiControllerTest {
         TestContainer testContainer = TestContainer.builder()
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
-        User user = User.builder()
-                .userId("1111")
-                .name("일일일일")
-                .profileImage("blank.jpg")
-                .build();
+        String user = "1111";
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writer(user)
+                .writerId(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
@@ -144,7 +153,7 @@ class FreeBoardApiControllerTest {
                 .contents("잘부탁드립니다")
                 .countOfAnswer(0)
                 .count(0)
-                .writer(user)
+                .writerId(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
@@ -174,23 +183,13 @@ class FreeBoardApiControllerTest {
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
         String userId = "1111";
-        String userName = "일일일일";
-        User user = User.builder()
-                .userId(userId)
-                .name(userName)
-                .profileImage("blank.jpg")
-                .build();
-        testContainer.userRepository.save(User.builder()
-                        .userId(userId)
-                        .name(userName)
-                .build());
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writer(user)
+                .writerId(userId)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
@@ -200,7 +199,7 @@ class FreeBoardApiControllerTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // when
-        ResponseEntity<FreeBoardResponse> result = testContainer.freeBoardApiController.getFreeBoard(id, "token");
+        ResponseEntity<FreeBoardResponse> result = testContainer.freeBoardApiController.getFreeBoard(id, "1111");
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(200));
@@ -212,7 +211,6 @@ class FreeBoardApiControllerTest {
         assertThat(result.getBody().isNew()).isTrue();
         assertThat(result.getBody().countOfAnswer()).isZero();
         assertThat(result.getBody().createDate()).isEqualTo(LocalDateTimeUtils.getTime(time));
-        assertThat(result.getBody().writer().getName()).isEqualTo("일일일일");
     }
 
     @Test
@@ -243,24 +241,20 @@ class FreeBoardApiControllerTest {
         TestContainer testContainer = TestContainer.builder()
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
-        User user = User.builder()
-                .userId("1111")
-                .name("일일일일")
-                .profileImage("blank.jpg")
-                .build();
+        String user = "1111";
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writer(user)
+                .writerId(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(true)
                 .build());
         long id = 1;
-        Authentication authentication = new FakeAuthentication(user.getUserId(),"test", Authority.ROLE_USER).getAuthentication();
+        Authentication authentication = new FakeAuthentication(user,"test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // when
@@ -279,23 +273,13 @@ class FreeBoardApiControllerTest {
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
         String userId = "1111";
-        String userName = "일일일일";
-        User user = User.builder()
-                .userId(userId)
-                .name(userName)
-                .profileImage("blank.jpg")
-                .build();
-        testContainer.userRepository.save(User.builder()
-                        .userId(userId)
-                        .name(userName)
-                .build());
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writer(user)
+                .writerId(userId)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
@@ -309,7 +293,7 @@ class FreeBoardApiControllerTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // when
-        ResponseEntity<FreeBoardResponse> result = testContainer.freeBoardApiController.updateBoard(request, "token");
+        ResponseEntity<FreeBoardResponse> result = testContainer.freeBoardApiController.update(request, "token");
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(200));
@@ -321,7 +305,6 @@ class FreeBoardApiControllerTest {
         assertThat(result.getBody().isNew()).isTrue();
         assertThat(result.getBody().countOfAnswer()).isZero();
         assertThat(result.getBody().createDate()).isEqualTo(LocalDateTimeUtils.getTime(time));
-        assertThat(result.getBody().writer().getName()).isEqualTo("일일일일");
     }
 
     @Test
@@ -344,7 +327,7 @@ class FreeBoardApiControllerTest {
         // when
         // then
         Assertions.assertThrows(NotFoundException.class, () -> {
-            testContainer.freeBoardApiController.updateBoard(request, "token");
+            testContainer.freeBoardApiController.update(request, "token");
         });
     }
 
@@ -356,18 +339,14 @@ class FreeBoardApiControllerTest {
         TestContainer testContainer = TestContainer.builder()
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
-        User user = User.builder()
-                .userId("1111")
-                .name("일일일일")
-                .profileImage("blank.jpg")
-                .build();
+        String user = "1111";
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writer(user)
+                .writerId(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(true)
@@ -383,7 +362,7 @@ class FreeBoardApiControllerTest {
         // when
         // then
         Assertions.assertThrows(DeletedEntityException.class, () -> {
-            testContainer.freeBoardApiController.updateBoard(request, "token");
+            testContainer.freeBoardApiController.update(request, "token");
         });
     }
 
@@ -395,18 +374,14 @@ class FreeBoardApiControllerTest {
         TestContainer testContainer = TestContainer.builder()
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
-        User user = User.builder()
-                .userId("1111")
-                .name("일일일일")
-                .profileImage("blank.jpg")
-                .build();
+        String user = "1111";
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writer(user)
+                .writerId(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
@@ -422,7 +397,7 @@ class FreeBoardApiControllerTest {
         // when
         // then
         Assertions.assertThrows(ForbiddenException.class, () -> {
-            testContainer.freeBoardApiController.updateBoard(request, "token");
+            testContainer.freeBoardApiController.update(request, "token");
         });
     }
 
@@ -434,18 +409,14 @@ class FreeBoardApiControllerTest {
         TestContainer testContainer = TestContainer.builder()
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
-        User user = User.builder()
-                .userId("1111")
-                .name("일일일일")
-                .profileImage("blank.jpg")
-                .build();
+        String user = "1111";
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writer(user)
+                .writerId(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
@@ -455,7 +426,7 @@ class FreeBoardApiControllerTest {
         long boardId = 1;
 
         // when
-        ResponseEntity<FreeBoardResponse> result = testContainer.freeBoardApiController.deleteBoard(boardId, "token");
+        ResponseEntity<FreeBoardResponse> result = testContainer.freeBoardApiController.delete(boardId, "token");
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(200));
@@ -471,18 +442,14 @@ class FreeBoardApiControllerTest {
         TestContainer testContainer = TestContainer.builder()
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
-        User user = User.builder()
-                .userId("1111")
-                .name("일일일일")
-                .profileImage("blank.jpg")
-                .build();
+        String user = "1111";
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writer(user)
+                .writerId(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
@@ -492,7 +459,7 @@ class FreeBoardApiControllerTest {
         long boardId = 1;
 
         // when
-        ResponseEntity<FreeBoardResponse> result = testContainer.freeBoardApiController.deleteBoard(boardId, "token");
+        ResponseEntity<FreeBoardResponse> result = testContainer.freeBoardApiController.delete(boardId, "token");
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(200));
@@ -514,7 +481,7 @@ class FreeBoardApiControllerTest {
         // when
         // then
         Assertions.assertThrows(NotFoundException.class, () -> {
-            testContainer.freeBoardApiController.deleteBoard(1L, "token");
+            testContainer.freeBoardApiController.delete(1L, "token");
         });
     }
 
@@ -526,18 +493,14 @@ class FreeBoardApiControllerTest {
         TestContainer testContainer = TestContainer.builder()
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
-        User user = User.builder()
-                .userId("1111")
-                .name("일일일일")
-                .profileImage("blank.jpg")
-                .build();
+        String user = "1111";
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writer(user)
+                .writerId(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(true)
@@ -548,7 +511,7 @@ class FreeBoardApiControllerTest {
         // when
         // then
         Assertions.assertThrows(DeletedEntityException.class, () -> {
-            testContainer.freeBoardApiController.deleteBoard(1L, "token");
+            testContainer.freeBoardApiController.delete(1L, "token");
         });
     }
 
@@ -560,18 +523,14 @@ class FreeBoardApiControllerTest {
         TestContainer testContainer = TestContainer.builder()
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
-        User user = User.builder()
-                .userId("1111")
-                .name("일일일일")
-                .profileImage("blank.jpg")
-                .build();
+        String user = "1111";
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writer(user)
+                .writerId(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
@@ -582,7 +541,7 @@ class FreeBoardApiControllerTest {
         // when
         // then
         Assertions.assertThrows(ForbiddenException.class, () -> {
-            testContainer.freeBoardApiController.deleteBoard(1L, "token");
+            testContainer.freeBoardApiController.delete(1L, "token");
         });
     }
 
@@ -594,12 +553,7 @@ class FreeBoardApiControllerTest {
         TestContainer testContainer = TestContainer.builder()
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
-        User user = User.builder()
-                .userId("1111")
-                .name("일일일일")
-                .profileImage("blank.jpg")
-                .build();
-        testContainer.userRepository.save(user);
+        String user = "1111";
 
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
@@ -607,7 +561,7 @@ class FreeBoardApiControllerTest {
                 .contents("내용")
                 .countOfAnswer(0)
                 .count(0)
-                .writer(user)
+                .writerId(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
@@ -618,7 +572,7 @@ class FreeBoardApiControllerTest {
                 .contents("잘부탁드립니다")
                 .countOfAnswer(0)
                 .count(0)
-                .writer(user)
+                .writerId(user)
                 .createDate(time)
                 .updateDate(time)
                 .isDeleted(false)
@@ -633,6 +587,38 @@ class FreeBoardApiControllerTest {
         assertThat(result.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(200));
         assertThat(result.getBody()).isNotNull();
         assertThat(result.getBody()).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("게시글 ID로 존재유무를 응답받는다.")
+    void existBoard(){
+        // given
+        LocalDateTime time = LocalDateTime.now();
+        TestContainer testContainer = TestContainer.builder()
+                .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
+                .build();
+        String user = "1111";
+
+        testContainer.freeBoardRepository.save(FreeBoard.builder()
+                .id(1L)
+                .title("제목")
+                .contents("내용")
+                .countOfAnswer(0)
+                .count(0)
+                .writerId(user)
+                .createDate(time)
+                .updateDate(time)
+                .isDeleted(false)
+                .build());
+        Authentication authentication = new FakeAuthentication("1111", "test", Authority.ROLE_USER).getAuthentication();
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // when
+        ResponseEntity<Boolean> result = testContainer.freeBoardApiController.existFreeBoard(1L);
+
+        // then
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(200));
+        assertThat(result.getBody()).isTrue();
     }
 
 }

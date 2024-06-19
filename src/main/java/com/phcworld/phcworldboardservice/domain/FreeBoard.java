@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class FreeBoard {
     private Long id;
-    private User writer;
+    private String writerId;
     private String title;
     private String contents;
     private LocalDateTime createDate;
@@ -35,12 +35,12 @@ public class FreeBoard {
     }
 
     public boolean matchUser(String userId) {
-        return writer.getUserId().equals(userId);
+        return this.writerId.equals(userId);
     }
 
-    public static FreeBoard from(FreeBoardRequest request, User user, LocalDateTimeHolder timeHolder) {
+    public static FreeBoard from(FreeBoardRequest request, String userId, LocalDateTimeHolder timeHolder) {
         return FreeBoard.builder()
-                .writer(user)
+                .writerId(userId)
                 .title(request.title())
                 .contents(request.contents())
                 .createDate(timeHolder.now())
@@ -54,7 +54,7 @@ public class FreeBoard {
     public FreeBoard addCount() {
         return FreeBoard.builder()
                 .id(id)
-                .writer(writer)
+                .writerId(writerId)
                 .title(title)
                 .contents(contents)
                 .createDate(createDate)
@@ -70,7 +70,7 @@ public class FreeBoard {
     public FreeBoard update(String title, String contents, LocalDateTimeHolder timeHolder) {
         return FreeBoard.builder()
                 .id(id)
-                .writer(writer)
+                .writerId(writerId)
                 .title(title)
                 .contents(contents)
                 .createDate(createDate)
@@ -84,7 +84,7 @@ public class FreeBoard {
     public FreeBoard delete() {
         return FreeBoard.builder()
                 .id(id)
-                .writer(writer)
+                .writerId(writerId)
                 .title(title)
                 .contents(contents)
                 .createDate(createDate)
@@ -109,7 +109,7 @@ public class FreeBoard {
 
         return FreeBoard.builder()
                 .id(id)
-                .writer(writer)
+                .writerId(writerId)
                 .title(title)
                 .contents(contents)
                 .createDate(createDate)
@@ -125,7 +125,7 @@ public class FreeBoard {
     public FreeBoard addCountOfAnswer() {
         return FreeBoard.builder()
                 .id(id)
-                .writer(writer)
+                .writerId(writerId)
                 .title(title)
                 .contents(contents)
                 .createDate(createDate)

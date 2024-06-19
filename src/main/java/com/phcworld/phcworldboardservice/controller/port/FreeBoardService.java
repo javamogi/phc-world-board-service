@@ -12,4 +12,6 @@ public interface FreeBoardService {
     FreeBoard update(FreeBoardRequest request);
     FreeBoard delete(Long boardId);
     List<FreeBoard> getFreeBoardsByUserId(String userId);
+
+    boolean existBoard(Long boardId);
 }
