@@ -24,15 +24,6 @@ spring:
       hibernate:
         format_sql: true
 
-server:
-  port: 8081
-  servlet:
-    encoding:
-      charset: UTF-8
-      force-request: true
-      force: true
-      force-response: true
-
 eureka:
   client:
     enabled: false

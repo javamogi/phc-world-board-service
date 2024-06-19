@@ -1,5 +1,6 @@
 package com.phcworld.phcworldboardservice.service;
 
+import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearch;
 import com.phcworld.phcworldboardservice.controller.port.WebclientService;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
 import com.phcworld.phcworldboardservice.exception.model.NotFoundException;
@@ -52,7 +53,7 @@ public class WebclientServiceImpl implements WebclientService {
                 .build()
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("{userId}")
+                        .path("/{userId}")
                         .build(finalUserId))
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .retrieve()
@@ -87,6 +88,37 @@ public class WebclientServiceImpl implements WebclientService {
                 throwable -> new HashMap<>());
         log.info("After called users microservice");
         return users;
+    }
+
+    @Override
+    public FreeBoardSearch getUserIdByName(String token, FreeBoardSearch search) {
+        log.info("Before call users microservice");
+        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
+        List<UserResponse> users = circuitBreaker.run(
+                () -> webClient.build()
+                .mutate().baseUrl(userUrl)
+                .build()
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/search")
+                        .queryParam("name", search.keyword())
+                        .build())
+                .header(HttpHeaders.AUTHORIZATION, token)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<UserResponse>>() {})
+                .block(),
+                throwable -> new ArrayList<>());
+        log.info("After called users microservice");
+        List<String> ids = users.stream()
+                .map(UserResponse::userId)
+                .toList();
+        return FreeBoardSearch.builder()
+                .userIds(ids)
+                .pageNum(search.pageNum())
+                .pageSize(search.pageSize())
+                .keyword(search.keyword())
+                .searchType(search.searchType())
+                .build();
     }
 
     @Override

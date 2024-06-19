@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/freeboards")
@@ -44,6 +45,11 @@ public class FreeBoardApiController {
     @GetMapping("")
     public ResponseEntity<List<FreeBoardResponse>> getList(FreeBoardSearch search,
                                                            @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+
+        if(Objects.nonNull(search.searchType()) && search.searchType().equals(3) && !search.keyword().isEmpty()){
+            search = webclientService.getUserIdByName(token, search);
+        }
+
         List<FreeBoard> freeBoards = freeBoardService.getSearchList(search);
         Map<String, UserResponse> users = webclientService.getUsers(token, freeBoards);
         List<FreeBoardResponse> result = freeBoards.stream()

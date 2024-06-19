@@ -1,5 +1,6 @@
 package com.phcworld.phcworldboardservice.mock;
 
+import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearch;
 import com.phcworld.phcworldboardservice.controller.port.WebclientService;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
 import com.phcworld.phcworldboardservice.exception.model.NotFoundException;
@@ -7,6 +8,7 @@ import com.phcworld.phcworldboardservice.service.port.FreeBoardAnswerResponse;
 import com.phcworld.phcworldboardservice.service.port.UserResponse;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class FakeWebClientService implements WebclientService {
 
@@ -72,14 +74,24 @@ public class FakeWebClientService implements WebclientService {
                 .toList();
         Map<String, UserResponse> map = new HashMap<>();
 
-        for (int i = 0; i < userIds.size(); i++){
-            int finalI = i;
-            Optional<UserResponse> user = users.stream()
-                    .filter(u -> u.userId().equals(userIds.get(finalI)))
-                    .findAny();
-            user.ifPresent(userResponse -> map.put(userIds.get(finalI), userResponse));
-        }
-
+        users.stream()
+                .filter(user -> userIds.contains(user.userId()))
+                .forEach(user -> map.put(user.userId(), user));
         return map;
+    }
+
+    @Override
+    public FreeBoardSearch getUserIdByName(String token, FreeBoardSearch search) {
+        List<String> userIds = users.stream()
+                .filter(user -> user.name().equals(search.keyword()))
+                .map(UserResponse::userId)
+                .toList();
+        return FreeBoardSearch.builder()
+                .userIds(userIds)
+                .pageNum(search.pageNum())
+                .pageSize(search.pageSize())
+                .keyword(search.keyword())
+                .searchType(search.searchType())
+                .build();
     }
 }

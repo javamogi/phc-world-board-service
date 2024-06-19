@@ -175,6 +175,53 @@ class FreeBoardApiControllerTest {
     }
 
     @Test
+    @DisplayName("작성자 이름으로 검색해서 게시글 목록을 가져올 수 있다.")
+    void getListWhenSearchWriterName(){
+        // given
+        LocalDateTime time = LocalDateTime.now();
+        TestContainer testContainer = TestContainer.builder()
+                .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
+                .build();
+        String user = "1111";
+        testContainer.freeBoardRepository.save(FreeBoard.builder()
+                .id(1L)
+                .title("제목")
+                .contents("내용")
+                .countOfAnswer(0)
+                .count(0)
+                .writerId(user)
+                .createDate(time)
+                .updateDate(time)
+                .isDeleted(false)
+                .build());
+        testContainer.freeBoardRepository.save(FreeBoard.builder()
+                .id(2L)
+                .title("안녕하세요")
+                .contents("잘부탁드립니다")
+                .countOfAnswer(0)
+                .count(0)
+                .writerId(user)
+                .createDate(time)
+                .updateDate(time)
+                .isDeleted(false)
+                .build());
+        FreeBoardSearch search = FreeBoardSearch.builder()
+                .searchType(3)
+                .keyword("테스트")
+                .pageNum(1)
+                .pageSize(5)
+                .build();
+
+        // when
+        ResponseEntity<List<FreeBoardResponse>> result = testContainer.freeBoardApiController.getList(search, "token");
+
+        // then
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(200));
+        assertThat(result.getBody()).isNotNull();
+        assertThat(result.getBody()).hasSize(2);
+    }
+
+    @Test
     @DisplayName("회원은 게시글의 id로 게시글을 가져올 수 있다.")
     void getFreeBoard(){
         // given

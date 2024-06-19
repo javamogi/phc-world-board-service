@@ -2,7 +2,6 @@ package com.phcworld.phcworldboardservice.mock;
 
 import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearch;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
-import com.phcworld.phcworldboardservice.domain.User;
 import com.phcworld.phcworldboardservice.service.port.FreeBoardRepository;
 import org.springframework.data.domain.Pageable;
 
@@ -59,11 +58,11 @@ public class FakeFreeBoardRepository implements FreeBoardRepository {
         } else if(searchDto.searchType().equals(1)){
             stream = data.stream()
                     .filter(freeBoard -> freeBoard.getContents().contains(searchDto.keyword()));
+        } else {
+            List<String> ids = searchDto.userIds();
+            stream = data.stream()
+                    .filter(freeBoard -> ids.contains(freeBoard.getWriterId()));
         }
-//        else {
-//            stream = data.stream()
-//                    .filter(freeBoard -> freeBoard.getWriter().getName().contains(searchDto.keyword()));
-//        }
         return stream.skip(pageable.getOffset() * pageable.getPageSize())
                 .limit(pageable.getPageSize())
                 .toList();

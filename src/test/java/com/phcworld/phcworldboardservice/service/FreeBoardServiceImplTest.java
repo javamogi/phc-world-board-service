@@ -18,6 +18,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -157,6 +159,26 @@ class FreeBoardServiceImplTest {
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.get(0).getTitle()).isEqualTo("안녕하세요.");
+    }
+
+    @Test
+    @DisplayName("작성자 이름으로 검색해서 게시글 목록을 가져올 수 있다.")
+    void getSearchListWhenSearchWriterName(){
+        // given
+        FreeBoardSearch search = FreeBoardSearch.builder()
+                .searchType(3)
+                .keyword("테스트")
+                .pageNum(1)
+                .pageSize(5)
+                .userIds(List.of("1111"))
+                .build();
+
+        // when
+        List<FreeBoard> result = freeBoardService.getSearchList(search);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.size()).isEqualTo(3);
     }
 
     @Test

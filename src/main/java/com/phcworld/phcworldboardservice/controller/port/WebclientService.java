@@ -12,4 +12,6 @@ public interface WebclientService {
     UserResponse getUser(String token, FreeBoard freeBoard);
 
     Map<String, UserResponse> getUsers(String token, List<FreeBoard> freeBoards);
+
+    FreeBoardSearch getUserIdByName(String token, FreeBoardSearch search);
 }
