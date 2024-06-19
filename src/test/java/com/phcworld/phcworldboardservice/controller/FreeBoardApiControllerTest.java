@@ -246,7 +246,7 @@ class FreeBoardApiControllerTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // when
-        ResponseEntity<FreeBoardResponse> result = testContainer.freeBoardApiController.getFreeBoard(id, "1111");
+        ResponseEntity<FreeBoardResponse> result = testContainer.freeBoardApiController.getFreeBoardWithAnswers(id, "1111");
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(200));
@@ -276,7 +276,7 @@ class FreeBoardApiControllerTest {
         // when
         // then
         Assertions.assertThrows(NotFoundException.class, () -> {
-            testContainer.freeBoardApiController.getFreeBoard(freeBoardId, "token");
+            testContainer.freeBoardApiController.getFreeBoardWithAnswers(freeBoardId, "token");
         });
     }
 
@@ -307,7 +307,7 @@ class FreeBoardApiControllerTest {
         // when
         // then
         Assertions.assertThrows(DeletedEntityException.class, () -> {
-            testContainer.freeBoardApiController.getFreeBoard(id, "token");
+            testContainer.freeBoardApiController.getFreeBoardWithAnswers(id, "token");
         });
     }
 
