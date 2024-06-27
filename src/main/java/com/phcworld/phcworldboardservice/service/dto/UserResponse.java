@@ -1,4 +1,4 @@
-package com.phcworld.phcworldboardservice.service.port;
+package com.phcworld.phcworldboardservice.service.dto;
 
 import com.phcworld.phcworldboardservice.domain.User;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package com.phcworld.phcworldboardservice.controller.port;
+package com.phcworld.phcworldboardservice.infrastructure.dto;
 
 import lombok.Builder;
 

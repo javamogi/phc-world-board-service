@@ -1,11 +1,11 @@
 package com.phcworld.phcworldboardservice.service;
 
-import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearch;
+import com.phcworld.phcworldboardservice.infrastructure.dto.FreeBoardSearch;
 import com.phcworld.phcworldboardservice.controller.port.FreeBoardService;
 import com.phcworld.phcworldboardservice.controller.port.WebclientService;
 import com.phcworld.phcworldboardservice.domain.Authority;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
-import com.phcworld.phcworldboardservice.domain.port.FreeBoardRequest;
+import com.phcworld.phcworldboardservice.domain.FreeBoardRequest;
 import com.phcworld.phcworldboardservice.exception.model.DeletedEntityException;
 import com.phcworld.phcworldboardservice.exception.model.ForbiddenException;
 import com.phcworld.phcworldboardservice.exception.model.NotFoundException;

@@ -1,7 +1,7 @@
 package com.phcworld.phcworldboardservice.infrastructure;
 
-import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearch;
-import com.phcworld.phcworldboardservice.infrastructure.port.FreeBoardSelectDto;
+import com.phcworld.phcworldboardservice.infrastructure.dto.FreeBoardSearch;
+import com.phcworld.phcworldboardservice.infrastructure.dto.FreeBoardSelectDto;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;

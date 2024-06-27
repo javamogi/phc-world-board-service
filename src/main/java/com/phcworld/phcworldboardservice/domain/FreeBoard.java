@@ -1,6 +1,5 @@
 package com.phcworld.phcworldboardservice.domain;
 
-import com.phcworld.phcworldboardservice.domain.port.FreeBoardRequest;
 import com.phcworld.phcworldboardservice.service.port.LocalDateTimeHolder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

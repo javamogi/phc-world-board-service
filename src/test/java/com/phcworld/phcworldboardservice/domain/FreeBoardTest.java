@@ -1,6 +1,5 @@
 package com.phcworld.phcworldboardservice.domain;
 
-import com.phcworld.phcworldboardservice.domain.port.FreeBoardRequest;
 import com.phcworld.phcworldboardservice.mock.FakeLocalDateTimeHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

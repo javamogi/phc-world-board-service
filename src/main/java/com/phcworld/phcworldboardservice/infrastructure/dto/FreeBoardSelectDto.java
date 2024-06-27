@@ -1,7 +1,6 @@
-package com.phcworld.phcworldboardservice.infrastructure.port;
+package com.phcworld.phcworldboardservice.infrastructure.dto;
 
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
-import com.phcworld.phcworldboardservice.domain.User;
 import lombok.*;
 
 import java.time.LocalDateTime;

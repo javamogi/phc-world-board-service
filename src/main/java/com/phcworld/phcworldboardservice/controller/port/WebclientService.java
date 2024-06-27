@@ -1,8 +1,9 @@
 package com.phcworld.phcworldboardservice.controller.port;
 
+import com.phcworld.phcworldboardservice.infrastructure.dto.FreeBoardSearch;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
-import com.phcworld.phcworldboardservice.service.port.FreeBoardAnswerResponse;
-import com.phcworld.phcworldboardservice.service.port.UserResponse;
+import com.phcworld.phcworldboardservice.service.dto.FreeBoardAnswerResponse;
+import com.phcworld.phcworldboardservice.service.dto.UserResponse;
 
 import java.util.List;
 import java.util.Map;

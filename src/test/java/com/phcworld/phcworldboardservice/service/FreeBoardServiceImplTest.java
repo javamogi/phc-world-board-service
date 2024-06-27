@@ -1,10 +1,9 @@
 package com.phcworld.phcworldboardservice.service;
 
-import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearch;
+import com.phcworld.phcworldboardservice.infrastructure.dto.FreeBoardSearch;
 import com.phcworld.phcworldboardservice.domain.Authority;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
-import com.phcworld.phcworldboardservice.domain.User;
-import com.phcworld.phcworldboardservice.domain.port.FreeBoardRequest;
+import com.phcworld.phcworldboardservice.domain.FreeBoardRequest;
 import com.phcworld.phcworldboardservice.exception.model.DeletedEntityException;
 import com.phcworld.phcworldboardservice.exception.model.ForbiddenException;
 import com.phcworld.phcworldboardservice.exception.model.NotFoundException;
@@ -18,8 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;

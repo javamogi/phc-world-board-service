@@ -1,9 +1,8 @@
 package com.phcworld.phcworldboardservice.infrastructure;
 
-import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearch;
+import com.phcworld.phcworldboardservice.infrastructure.dto.FreeBoardSearch;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
-import com.phcworld.phcworldboardservice.domain.User;
-import com.phcworld.phcworldboardservice.infrastructure.port.FreeBoardSelectDto;
+import com.phcworld.phcworldboardservice.infrastructure.dto.FreeBoardSelectDto;
 import com.phcworld.phcworldboardservice.service.port.FreeBoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
