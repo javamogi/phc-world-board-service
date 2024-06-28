@@ -50,6 +50,11 @@ public class FakeFreeBoardRepository implements FreeBoardRepository {
     }
 
     @Override
+    public Optional<FreeBoard> findByBoardId(String boardId) {
+        return data.stream().filter(freeBoard -> freeBoard.getBoardId().equals(boardId)).findAny();
+    }
+
+    @Override
     public List<FreeBoard> findByKeyword(FreeBoardSearch searchDto, Pageable pageable) {
         Stream<FreeBoard> stream = null;
         if(searchDto.searchType().equals(0)) {

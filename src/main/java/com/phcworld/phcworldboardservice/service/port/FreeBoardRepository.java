@@ -9,7 +9,9 @@ import java.util.Optional;
 
 public interface FreeBoardRepository {
     List<FreeBoard> findByWriterId(String writerId);
-    Optional<FreeBoard> findById(Long boardId);
     List<FreeBoard> findByKeyword(FreeBoardSearch searchDto, Pageable pageable);
     FreeBoard save(FreeBoard freeBoard);
+    Optional<FreeBoard> findByBoardId(String boardId);
+
+    Optional<FreeBoard> findById(Long boardId);
 }

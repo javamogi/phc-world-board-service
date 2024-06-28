@@ -26,12 +26,6 @@ public class FreeBoardRepositoryImpl implements FreeBoardRepository {
     }
 
     @Override
-    public Optional<FreeBoard> findById(Long boardId) {
-        return freeBoardJpaRepository.findById(boardId)
-                .map(FreeBoardEntity::toModel);
-    }
-
-    @Override
     public List<FreeBoard> findByKeyword(FreeBoardSearch searchDto, Pageable pageable) {
         return freeBoardJpaRepository.findByKeyword(searchDto, pageable)
                 .stream()
@@ -42,5 +36,18 @@ public class FreeBoardRepositoryImpl implements FreeBoardRepository {
     @Override
     public FreeBoard save(FreeBoard freeBoard) {
         return freeBoardJpaRepository.save(FreeBoardEntity.from(freeBoard)).toModel();
+    }
+
+    @Override
+    public Optional<FreeBoard> findByBoardId(String boardId) {
+        return freeBoardJpaRepository.findByBoardId(boardId)
+                .map(FreeBoardEntity::toModel);
+    }
+
+    // use answer consumer
+    @Override
+    public Optional<FreeBoard> findById(Long boardId) {
+        return freeBoardJpaRepository.findById(boardId)
+                .map(FreeBoardEntity::toModel);
     }
 }

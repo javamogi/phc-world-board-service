@@ -36,6 +36,9 @@ public class FreeBoardEntity {
 //	private String boardId;
 
 	@Column(nullable = false)
+	private String boardId;
+
+	@Column(nullable = false)
 	private String writerId;
 
 	@Column(nullable = false)
@@ -65,6 +68,7 @@ public class FreeBoardEntity {
 	public static FreeBoardEntity from(FreeBoard freeBoard) {
 		return FreeBoardEntity.builder()
 				.id(freeBoard.getId())
+				.boardId(freeBoard.getBoardId())
 				.writerId(freeBoard.getWriterId())
 				.title(freeBoard.getTitle())
 				.contents(freeBoard.getContents())
@@ -79,6 +83,7 @@ public class FreeBoardEntity {
 	public FreeBoard toModel() {
 		return FreeBoard.builder()
 				.id(id)
+				.boardId(boardId)
 				.writerId(writerId)
 				.title(title)
 				.contents(contents)

@@ -37,6 +37,7 @@ class FreeBoardQueryApiControllerTest {
 
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
@@ -48,6 +49,7 @@ class FreeBoardQueryApiControllerTest {
                 .build());
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(2L)
+                .boardId("board-2")
                 .title("안녕하세요")
                 .contents("잘부탁드립니다")
                 .countOfAnswer(0)
@@ -84,6 +86,7 @@ class FreeBoardQueryApiControllerTest {
         String user = "1111";
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
@@ -95,6 +98,7 @@ class FreeBoardQueryApiControllerTest {
                 .build());
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(2L)
+                .boardId("board-2")
                 .title("안녕하세요")
                 .contents("잘부탁드립니다")
                 .countOfAnswer(0)
@@ -131,6 +135,7 @@ class FreeBoardQueryApiControllerTest {
         String user = "1111";
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
@@ -142,6 +147,7 @@ class FreeBoardQueryApiControllerTest {
                 .build());
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(2L)
+                .boardId("board-2")
                 .title("안녕하세요")
                 .contents("잘부탁드립니다")
                 .countOfAnswer(0)
@@ -178,6 +184,7 @@ class FreeBoardQueryApiControllerTest {
         String userId = "1111";
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
@@ -187,7 +194,7 @@ class FreeBoardQueryApiControllerTest {
                 .updateDate(time)
                 .isDeleted(false)
                 .build());
-        long id = 1;
+        String id = "board-1";
         Authentication authentication = new FakeAuthentication(userId, "test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -197,7 +204,7 @@ class FreeBoardQueryApiControllerTest {
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(200));
         assertThat(result.getBody()).isNotNull();
-        assertThat(result.getBody().boardId()).isEqualTo(1);
+        assertThat(result.getBody().boardId()).isEqualTo("board-1");
         assertThat(result.getBody().title()).isEqualTo("제목");
         assertThat(result.getBody().contents()).isEqualTo("내용");
         assertThat(result.getBody().count()).isEqualTo(1);
@@ -215,7 +222,7 @@ class FreeBoardQueryApiControllerTest {
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
                 .build();
         String userId = "1111";
-        long freeBoardId = 1;
+        String freeBoardId = "board-1";
         Authentication authentication = new FakeAuthentication(userId, "test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -237,6 +244,7 @@ class FreeBoardQueryApiControllerTest {
         String user = "1111";
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
@@ -246,7 +254,7 @@ class FreeBoardQueryApiControllerTest {
                 .updateDate(time)
                 .isDeleted(true)
                 .build());
-        long id = 1;
+        String id = "board-1";
         Authentication authentication = new FakeAuthentication(user,"test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -269,6 +277,7 @@ class FreeBoardQueryApiControllerTest {
 
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
@@ -280,6 +289,7 @@ class FreeBoardQueryApiControllerTest {
                 .build());
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(2L)
+                .boardId("board-2")
                 .title("안녕하세요")
                 .contents("잘부탁드립니다")
                 .countOfAnswer(0)
@@ -313,6 +323,7 @@ class FreeBoardQueryApiControllerTest {
 
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
@@ -326,12 +337,12 @@ class FreeBoardQueryApiControllerTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // when
-        ResponseEntity<FreeBoardResponse> result = testContainer.freeBoardQueryApiController.existFreeBoard(1L);
+        ResponseEntity<FreeBoardResponse> result = testContainer.freeBoardQueryApiController.existFreeBoard("board-1");
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(200));
         assertThat(result.getBody()).isNotNull();
-        assertThat(result.getBody().boardId()).isEqualTo(1);
+        assertThat(result.getBody().boardId()).isEqualTo("board-1");
         assertThat(result.getBody().title()).isEqualTo("제목");
         assertThat(result.getBody().contents()).isEqualTo("내용");
         assertThat(result.getBody().countOfAnswer()).isZero();
@@ -354,7 +365,7 @@ class FreeBoardQueryApiControllerTest {
         // when
         // then
         Assertions.assertThrows(NotFoundException.class, () -> {
-            testContainer.freeBoardQueryApiController.existFreeBoard(1L);
+            testContainer.freeBoardQueryApiController.existFreeBoard("board-1");
         });
     }
 

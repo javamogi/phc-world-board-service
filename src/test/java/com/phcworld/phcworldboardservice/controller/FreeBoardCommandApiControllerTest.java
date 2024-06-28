@@ -10,6 +10,7 @@ import com.phcworld.phcworldboardservice.exception.model.NotFoundException;
 import com.phcworld.phcworldboardservice.mock.FakeAuthentication;
 import com.phcworld.phcworldboardservice.mock.FakeLocalDateTimeHolder;
 import com.phcworld.phcworldboardservice.mock.TestContainer;
+import com.phcworld.phcworldboardservice.mock.TestUuidHolder;
 import com.phcworld.phcworldboardservice.utils.LocalDateTimeUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -32,6 +33,7 @@ class FreeBoardCommandApiControllerTest {
         LocalDateTime time = LocalDateTime.now();
         TestContainer testContainer = TestContainer.builder()
                 .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
+                .uuidHolder(new TestUuidHolder("board-new"))
                 .build();
         FreeBoardRequest request = FreeBoardRequest.builder()
                 .title("제목")
@@ -46,6 +48,7 @@ class FreeBoardCommandApiControllerTest {
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(201));
         assertThat(result.getBody()).isNotNull();
+        assertThat(result.getBody().boardId()).isEqualTo("board-new");
         assertThat(result.getBody().title()).isEqualTo("제목");
         assertThat(result.getBody().contents()).isEqualTo("내용");
         assertThat(result.getBody().count()).isZero();
@@ -87,6 +90,7 @@ class FreeBoardCommandApiControllerTest {
         String userId = "1111";
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
@@ -97,7 +101,7 @@ class FreeBoardCommandApiControllerTest {
                 .isDeleted(false)
                 .build());
         FreeBoardRequest request = FreeBoardRequest.builder()
-                .id(1L)
+                .boardId("board-1")
                 .title("제목수정")
                 .contents("내용수정")
                 .build();
@@ -110,7 +114,7 @@ class FreeBoardCommandApiControllerTest {
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(200));
         assertThat(result.getBody()).isNotNull();
-        assertThat(result.getBody().boardId()).isEqualTo(1);
+        assertThat(result.getBody().boardId()).isEqualTo("board-1");
         assertThat(result.getBody().title()).isEqualTo("제목수정");
         assertThat(result.getBody().contents()).isEqualTo("내용수정");
         assertThat(result.getBody().count()).isZero();
@@ -129,7 +133,7 @@ class FreeBoardCommandApiControllerTest {
                 .build();
         String userId = "1111";
         FreeBoardRequest request = FreeBoardRequest.builder()
-                .id(1L)
+                .boardId("board-1")
                 .title("제목수정")
                 .contents("내용수정")
                 .build();
@@ -154,6 +158,7 @@ class FreeBoardCommandApiControllerTest {
         String user = "1111";
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
@@ -164,7 +169,7 @@ class FreeBoardCommandApiControllerTest {
                 .isDeleted(true)
                 .build());
         FreeBoardRequest request = FreeBoardRequest.builder()
-                .id(1L)
+                .boardId("board-1")
                 .title("제목수정")
                 .contents("내용수정")
                 .build();
@@ -189,6 +194,7 @@ class FreeBoardCommandApiControllerTest {
         String user = "1111";
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
@@ -199,7 +205,7 @@ class FreeBoardCommandApiControllerTest {
                 .isDeleted(false)
                 .build());
         FreeBoardRequest request = FreeBoardRequest.builder()
-                .id(1L)
+                .boardId("board-1")
                 .title("제목수정")
                 .contents("내용수정")
                 .build();
@@ -224,6 +230,7 @@ class FreeBoardCommandApiControllerTest {
         String user = "1111";
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
@@ -235,7 +242,7 @@ class FreeBoardCommandApiControllerTest {
                 .build());
         Authentication authentication = new FakeAuthentication("1111", "test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        long boardId = 1;
+        String boardId = "board-1";
 
         // when
         ResponseEntity<FreeBoardResponse> result = testContainer.freeBoardCommandApiController.delete(boardId, "token");
@@ -257,6 +264,7 @@ class FreeBoardCommandApiControllerTest {
         String user = "1111";
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
@@ -268,7 +276,7 @@ class FreeBoardCommandApiControllerTest {
                 .build());
         Authentication authentication = new FakeAuthentication("2222", "test2", Authority.ROLE_ADMIN).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        long boardId = 1;
+        String boardId = "board-1";
 
         // when
         ResponseEntity<FreeBoardResponse> result = testContainer.freeBoardCommandApiController.delete(boardId, "token");
@@ -293,7 +301,7 @@ class FreeBoardCommandApiControllerTest {
         // when
         // then
         Assertions.assertThrows(NotFoundException.class, () -> {
-            testContainer.freeBoardCommandApiController.delete(1L, "token");
+            testContainer.freeBoardCommandApiController.delete("board-1", "token");
         });
     }
 
@@ -308,6 +316,7 @@ class FreeBoardCommandApiControllerTest {
         String user = "1111";
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
@@ -323,7 +332,7 @@ class FreeBoardCommandApiControllerTest {
         // when
         // then
         Assertions.assertThrows(DeletedEntityException.class, () -> {
-            testContainer.freeBoardCommandApiController.delete(1L, "token");
+            testContainer.freeBoardCommandApiController.delete("board-1", "token");
         });
     }
 
@@ -338,6 +347,7 @@ class FreeBoardCommandApiControllerTest {
         String user = "1111";
         testContainer.freeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
@@ -353,7 +363,7 @@ class FreeBoardCommandApiControllerTest {
         // when
         // then
         Assertions.assertThrows(ForbiddenException.class, () -> {
-            testContainer.freeBoardCommandApiController.delete(1L, "token");
+            testContainer.freeBoardCommandApiController.delete("board-1", "token");
         });
     }
 

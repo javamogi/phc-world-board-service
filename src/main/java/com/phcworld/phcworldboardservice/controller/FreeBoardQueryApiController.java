@@ -41,7 +41,7 @@ public class FreeBoardQueryApiController {
         List<FreeBoardResponse> result = freeBoards.stream()
                 .map(f -> {
                     return FreeBoardResponse.builder()
-                            .boardId(f.getId())
+                            .boardId(f.getBoardId())
                             .title(f.getTitle())
                             .contents(f.getContents())
                             .writer(users != null ? users.get(f.getWriterId()) : null)
@@ -60,7 +60,7 @@ public class FreeBoardQueryApiController {
             @ApiResponse(responseCode = "409", description = "삭제된 게시글")
     })
     @GetMapping("/{freeBoardId}")
-    public ResponseEntity<FreeBoardResponse> getFreeBoardWithAnswers(@PathVariable(name = "freeBoardId") Long freeBoardId,
+    public ResponseEntity<FreeBoardResponse> getFreeBoardWithAnswers(@PathVariable(name = "freeBoardId") String freeBoardId,
                                                                      @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
         FreeBoard freeBoard = freeBoardService.getFreeBoard(freeBoardId);
         UserResponse user = webclientService.getUser(token, freeBoard);
@@ -82,7 +82,7 @@ public class FreeBoardQueryApiController {
     }
 
     @GetMapping("/{freeBoardId}/exist")
-    public ResponseEntity<FreeBoardResponse> existFreeBoard(@PathVariable(name = "freeBoardId") Long freeBoardId){
+    public ResponseEntity<FreeBoardResponse> existFreeBoard(@PathVariable(name = "freeBoardId") String freeBoardId){
         FreeBoard result = freeBoardService.existBoard(freeBoardId);
         return ResponseEntity
                 .ok()
