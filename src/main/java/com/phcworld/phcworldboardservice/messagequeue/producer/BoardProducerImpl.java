@@ -4,14 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
 import com.phcworld.phcworldboardservice.exception.model.InternalServerErrorException;
-import com.phcworld.phcworldboardservice.messagequeue.port.*;
+import com.phcworld.phcworldboardservice.messagequeue.dto.*;
 import com.phcworld.phcworldboardservice.service.port.KafkaProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;

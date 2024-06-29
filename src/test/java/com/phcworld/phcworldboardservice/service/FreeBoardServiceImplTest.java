@@ -1,15 +1,15 @@
 package com.phcworld.phcworldboardservice.service;
 
-import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearch;
+import com.phcworld.phcworldboardservice.infrastructure.dto.FreeBoardSearch;
 import com.phcworld.phcworldboardservice.domain.Authority;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
-import com.phcworld.phcworldboardservice.domain.User;
-import com.phcworld.phcworldboardservice.domain.port.FreeBoardRequest;
+import com.phcworld.phcworldboardservice.domain.FreeBoardRequest;
 import com.phcworld.phcworldboardservice.exception.model.DeletedEntityException;
 import com.phcworld.phcworldboardservice.exception.model.ForbiddenException;
 import com.phcworld.phcworldboardservice.exception.model.NotFoundException;
 import com.phcworld.phcworldboardservice.mock.*;
 import com.phcworld.phcworldboardservice.service.port.LocalDateTimeHolder;
+import com.phcworld.phcworldboardservice.service.port.UuidHolder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,8 +18,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -33,7 +31,9 @@ class FreeBoardServiceImplTest {
         LocalDateTime time = LocalDateTime.of(2024, 6, 14, 11, 11, 11, 111111);
         FakeFreeBoardRepository fakeFreeBoardRepository = new FakeFreeBoardRepository();
         LocalDateTimeHolder localDateTimeHolder = new FakeLocalDateTimeHolder(time);
+        UuidHolder uuidHolder = new TestUuidHolder("board-new");
         this.freeBoardService = FreeBoardServiceImpl.builder()
+                .uuidHolder(uuidHolder)
                 .freeBoardRepository(fakeFreeBoardRepository)
                 .boardProducer(new FakeKafkaProducer())
                 .localDateTimeHolder(localDateTimeHolder)
@@ -43,6 +43,7 @@ class FreeBoardServiceImplTest {
 
         fakeFreeBoardRepository.save(FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
@@ -57,6 +58,7 @@ class FreeBoardServiceImplTest {
 
         fakeFreeBoardRepository.save(FreeBoard.builder()
                 .id(2L)
+                .boardId("board-2")
                 .title("제목2")
                 .contents("내용2")
                 .countOfAnswer(0)
@@ -71,6 +73,7 @@ class FreeBoardServiceImplTest {
 
         fakeFreeBoardRepository.save(FreeBoard.builder()
                 .id(3L)
+                .boardId("board-3")
                 .title("안녕하세요.")
                 .contents("잘부탁드립니다.")
                 .countOfAnswer(0)
@@ -84,6 +87,7 @@ class FreeBoardServiceImplTest {
                 .build());
         fakeFreeBoardRepository.save(FreeBoard.builder()
                 .id(4L)
+                .boardId("board-4")
                 .title("삭제테스트")
                 .contents("삭제테스트를위한데이터")
                 .countOfAnswer(0)
@@ -112,6 +116,7 @@ class FreeBoardServiceImplTest {
         FreeBoard result = freeBoardService.register(request);
 
         // then
+        assertThat(result.getBoardId()).isEqualTo("board-new");
         assertThat(result.getTitle()).isEqualTo("제목");
         assertThat(result.getContents()).isEqualTo("내용");
         assertThat(result.getCount()).isZero();
@@ -181,11 +186,34 @@ class FreeBoardServiceImplTest {
         assertThat(result.size()).isEqualTo(3);
     }
 
+//    @Test
+//    @DisplayName("회원은 게시글의 id로 게시글을 가져올 수 있다.")
+//    void getFreeBoardById(){
+//        // given
+//        long freeBoardId = 1;
+//        Authentication authentication = new FakeAuthentication("1111", "test", Authority.ROLE_USER).getAuthentication();
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+//
+//        // when
+//        FreeBoard result = freeBoardService.getFreeBoard(freeBoardId);
+//
+//        // then
+//        assertThat(result).isNotNull();
+//        assertThat(result.getId()).isEqualTo(freeBoardId);
+//        assertThat(result.getTitle()).isEqualTo("제목");
+//        assertThat(result.getContents()).isEqualTo("내용");
+//        assertThat(result.getCount()).isEqualTo(1);
+//        assertThat(result.getWriterId()).isEqualTo("1111");
+//        assertThat(result.getCreateDate()).isEqualTo(LocalDateTime.of(2024, 6, 14, 11, 11, 11, 111111));
+//        assertThat(result.getIsModifyAuthority()).isTrue();
+//        assertThat(result.getIsDeleteAuthority()).isTrue();
+//    }
+
     @Test
-    @DisplayName("회원은 게시글의 id로 게시글을 가져올 수 있다.")
-    void getFreeBoard(){
+    @DisplayName("회원은 게시글의 고유 id로 게시글을 가져올 수 있다.")
+    void getFreeBoardByBoardId(){
         // given
-        long freeBoardId = 1;
+        String freeBoardId = "board-1";
         Authentication authentication = new FakeAuthentication("1111", "test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -194,7 +222,7 @@ class FreeBoardServiceImplTest {
 
         // then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(freeBoardId);
+        assertThat(result.getBoardId()).isEqualTo(freeBoardId);
         assertThat(result.getTitle()).isEqualTo("제목");
         assertThat(result.getContents()).isEqualTo("내용");
         assertThat(result.getCount()).isEqualTo(1);
@@ -208,12 +236,12 @@ class FreeBoardServiceImplTest {
     @DisplayName("id의 게시글이 없는 경우 게시글을 가져올 수 없다.")
     void failedGetFreeBoardWhenNotFoundFreeBoard(){
         // given
-        long id = 999;
+        String boardId = "board-999";
 
         // when
         // then
         Assertions.assertThrows(NotFoundException.class, () -> {
-            freeBoardService.getFreeBoard(id);
+            freeBoardService.getFreeBoard(boardId);
         });
     }
 
@@ -221,12 +249,12 @@ class FreeBoardServiceImplTest {
     @DisplayName("id의 게시글이 삭제된 경우 게시글을 가져올 수 없다.")
     void failedGetFreeBoardWhenDeletedFreeBoard(){
         // given
-        long id = 4;
+        String boardId = "board-4";
 
         // when
         // then
         Assertions.assertThrows(DeletedEntityException.class, () -> {
-            freeBoardService.getFreeBoard(id);
+            freeBoardService.getFreeBoard(boardId);
         });
     }
 
@@ -235,7 +263,7 @@ class FreeBoardServiceImplTest {
     void update(){
         // given
         FreeBoardRequest request = FreeBoardRequest.builder()
-                .id(1L)
+                .boardId("board-1")
                 .title("제목수정")
                 .contents("내용수정")
                 .build();
@@ -248,6 +276,7 @@ class FreeBoardServiceImplTest {
         // then
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(1);
+        assertThat(result.getBoardId()).isEqualTo("board-1");
         assertThat(result.getTitle()).isEqualTo("제목수정");
         assertThat(result.getContents()).isEqualTo("내용수정");
         assertThat(result.getCount()).isZero();
@@ -259,7 +288,7 @@ class FreeBoardServiceImplTest {
     void failedUpdateWhenNotFound(){
         // given
         FreeBoardRequest request = FreeBoardRequest.builder()
-                .id(999L)
+                .boardId("board-999")
                 .title("제목수정")
                 .contents("내용수정")
                 .build();
@@ -276,7 +305,7 @@ class FreeBoardServiceImplTest {
     void failedUpdateWhenDeleted(){
         // given
         FreeBoardRequest request = FreeBoardRequest.builder()
-                .id(4L)
+                .boardId("board-4")
                 .title("제목수정")
                 .contents("내용수정")
                 .build();
@@ -293,7 +322,7 @@ class FreeBoardServiceImplTest {
     void failedUpdateWhenNotEqualWriter(){
         // given
         FreeBoardRequest request = FreeBoardRequest.builder()
-                .id(1L)
+                .boardId("board-1")
                 .title("제목수정")
                 .contents("내용수정")
                 .build();
@@ -311,16 +340,17 @@ class FreeBoardServiceImplTest {
     @DisplayName("작성자는 게시글 ID로 삭제할 수 있다.")
     void delete(){
         // given
-        long id = 1;
+        String boardId = "board-1";
         Authentication authentication = new FakeAuthentication("1111", "test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // when
-        FreeBoard result = freeBoardService.delete(id);
+        FreeBoard result = freeBoardService.delete(boardId);
 
         // then
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(1);
+        assertThat(result.getBoardId()).isEqualTo("board-1");
         assertThat(result.getTitle()).isEqualTo("제목");
         assertThat(result.getContents()).isEqualTo("내용");
         assertThat(result.getWriterId()).isEqualTo("1111");
@@ -331,7 +361,7 @@ class FreeBoardServiceImplTest {
     @DisplayName("관리자는 게시글 ID로 삭제할 수 있다.")
     void deleteByAdmin(){
         // given
-        long id = 1;
+        String id = "board-1";
         Authentication authentication = new FakeAuthentication("1111", "test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -341,6 +371,7 @@ class FreeBoardServiceImplTest {
         // then
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(1);
+        assertThat(result.getBoardId()).isEqualTo("board-1");
         assertThat(result.getTitle()).isEqualTo("제목");
         assertThat(result.getContents()).isEqualTo("내용");
         assertThat(result.getWriterId()).isEqualTo("1111");
@@ -351,7 +382,7 @@ class FreeBoardServiceImplTest {
     @DisplayName("등록되지 않은 게시물은 삭제할 수 없다.")
     void failedDelteWhenNotFound(){
         // given
-        long id = 999;
+        String id = "board-999";
         Authentication authentication = new FakeAuthentication("1111", "test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -366,7 +397,7 @@ class FreeBoardServiceImplTest {
     @DisplayName("이미 삭제된 게시물은 삭제할 수 없다.")
     void failedDeleteWhenDeleted(){
         // given
-        long id = 4;
+        String id = "board-4";
         Authentication authentication = new FakeAuthentication("1111", "test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -381,7 +412,7 @@ class FreeBoardServiceImplTest {
     @DisplayName("작성자가 다르면 삭제할 수 없다.")
     void failedDeletedWhenNotEqualWriter(){
         // given
-        long id = 1;
+        String id = "board-1";
         Authentication authentication = new FakeAuthentication("2222", "test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -417,7 +448,7 @@ class FreeBoardServiceImplTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // when
-        FreeBoard result = freeBoardService.existBoard(1L);
+        FreeBoard result = freeBoardService.existBoard("board-1");
 
         // then
         assertThat(result).isNotNull();
@@ -433,7 +464,7 @@ class FreeBoardServiceImplTest {
         // when
         // then
         Assertions.assertThrows(NotFoundException.class, () -> {
-            freeBoardService.existBoard(99L);
+            freeBoardService.existBoard("board-00");
         });
     }
 }

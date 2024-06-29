@@ -1,8 +1,7 @@
-package com.phcworld.phcworldboardservice.messagequeue.port;
+package com.phcworld.phcworldboardservice.messagequeue.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 
 @Getter

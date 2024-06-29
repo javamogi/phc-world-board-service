@@ -1,14 +1,13 @@
 package com.phcworld.phcworldboardservice.mock;
 
-import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearch;
+import com.phcworld.phcworldboardservice.infrastructure.dto.FreeBoardSearch;
 import com.phcworld.phcworldboardservice.controller.port.WebclientService;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
 import com.phcworld.phcworldboardservice.exception.model.NotFoundException;
-import com.phcworld.phcworldboardservice.service.port.FreeBoardAnswerResponse;
-import com.phcworld.phcworldboardservice.service.port.UserResponse;
+import com.phcworld.phcworldboardservice.service.dto.FreeBoardAnswerResponse;
+import com.phcworld.phcworldboardservice.service.dto.UserResponse;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class FakeWebClientService implements WebclientService {
 

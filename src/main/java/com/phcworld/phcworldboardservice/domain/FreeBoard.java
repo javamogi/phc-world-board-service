@@ -1,10 +1,11 @@
 package com.phcworld.phcworldboardservice.domain;
 
-import com.phcworld.phcworldboardservice.domain.port.FreeBoardRequest;
 import com.phcworld.phcworldboardservice.service.port.LocalDateTimeHolder;
+import com.phcworld.phcworldboardservice.service.port.UuidHolder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -12,8 +13,11 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @AllArgsConstructor
+@ToString
 public class FreeBoard {
     private Long id;
+
+    private String boardId;
     private String writerId;
     private String title;
     private String contents;
@@ -24,6 +28,20 @@ public class FreeBoard {
     private int countOfAnswer;
     Boolean isDeleteAuthority;
     Boolean isModifyAuthority;
+
+    public static FreeBoard from(FreeBoard freeBoard, UuidHolder uuidHolder) {
+        return FreeBoard.builder()
+                .boardId(uuidHolder.random())
+                .writerId(freeBoard.getWriterId())
+                .title(freeBoard.getTitle())
+                .contents(freeBoard.getContents())
+                .createDate(freeBoard.getCreateDate())
+                .updateDate(freeBoard.getUpdateDate())
+                .count(freeBoard.getCount())
+                .countOfAnswer(freeBoard.getCountOfAnswer())
+                .isDeleted(freeBoard.isDeleted())
+                .build();
+    }
 
     public Boolean isNew(){
         final int HOUR_OF_DAY = 24;
@@ -38,8 +56,12 @@ public class FreeBoard {
         return this.writerId.equals(userId);
     }
 
-    public static FreeBoard from(FreeBoardRequest request, String userId, LocalDateTimeHolder timeHolder) {
+    public static FreeBoard from(FreeBoardRequest request,
+                                 String userId,
+                                 LocalDateTimeHolder timeHolder,
+                                 UuidHolder uuidHolder) {
         return FreeBoard.builder()
+                .boardId(uuidHolder.random())
                 .writerId(userId)
                 .title(request.title())
                 .contents(request.contents())
@@ -54,6 +76,7 @@ public class FreeBoard {
     public FreeBoard addCount() {
         return FreeBoard.builder()
                 .id(id)
+                .boardId(boardId)
                 .writerId(writerId)
                 .title(title)
                 .contents(contents)
@@ -70,6 +93,7 @@ public class FreeBoard {
     public FreeBoard update(String title, String contents, LocalDateTimeHolder timeHolder) {
         return FreeBoard.builder()
                 .id(id)
+                .boardId(boardId)
                 .writerId(writerId)
                 .title(title)
                 .contents(contents)
@@ -84,6 +108,7 @@ public class FreeBoard {
     public FreeBoard delete() {
         return FreeBoard.builder()
                 .id(id)
+                .boardId(boardId)
                 .writerId(writerId)
                 .title(title)
                 .contents(contents)
@@ -109,6 +134,7 @@ public class FreeBoard {
 
         return FreeBoard.builder()
                 .id(id)
+                .boardId(boardId)
                 .writerId(writerId)
                 .title(title)
                 .contents(contents)
@@ -125,6 +151,7 @@ public class FreeBoard {
     public FreeBoard addCountOfAnswer() {
         return FreeBoard.builder()
                 .id(id)
+                .boardId(boardId)
                 .writerId(writerId)
                 .title(title)
                 .contents(contents)

@@ -1,7 +1,7 @@
 package com.phcworld.phcworldboardservice.domain;
 
-import com.phcworld.phcworldboardservice.domain.port.FreeBoardRequest;
 import com.phcworld.phcworldboardservice.mock.FakeLocalDateTimeHolder;
+import com.phcworld.phcworldboardservice.mock.TestUuidHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -23,10 +23,14 @@ class FreeBoardTest {
         String user = "1111";
 
         // when
-        FreeBoard result = FreeBoard.from(freeBoardRequest, user, new FakeLocalDateTimeHolder(time));
+        FreeBoard result = FreeBoard.from(freeBoardRequest,
+                user,
+                new FakeLocalDateTimeHolder(time),
+                new TestUuidHolder("board-1"));
 
         // then
         assertThat(result.getId()).isNull();
+        assertThat(result.getBoardId()).isEqualTo("board-1");
         assertThat(result.getTitle()).isEqualTo("제목");
         assertThat(result.getContents()).isEqualTo("내용");
         assertThat(result.getCount()).isZero();
@@ -38,12 +42,41 @@ class FreeBoardTest {
 
     @Test
     @DisplayName("게시글의 등록일이 24시간 내라면 새로운 글이다.")
-    void g(){
+    void registerWithin24hours(){
         // given
         LocalDateTime time = LocalDateTime.now();
         String user = "1111";
         FreeBoard freeBoard = FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
+                .title("제목")
+                .contents("내용")
+                .countOfAnswer(0)
+                .count(0)
+                .writerId(user)
+                .createDate(time)
+                .updateDate(time)
+                .isDeleteAuthority(true)
+                .isModifyAuthority(true)
+                .isDeleted(false)
+                .build();
+
+        // when
+        boolean result = freeBoard.isNew();
+
+        // then
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("게시글의 등록일이 24시간 이후라면 새로운 글이 안디ㅏ.")
+    void registerAfter24hours(){
+        // given
+        LocalDateTime time = LocalDateTime.now();
+        String user = "1111";
+        FreeBoard freeBoard = FreeBoard.builder()
+                .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
@@ -71,6 +104,7 @@ class FreeBoardTest {
         String user = "1111";
         FreeBoard freeBoard = FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
@@ -98,6 +132,7 @@ class FreeBoardTest {
         String user = "1111";
         FreeBoard freeBoard = FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
@@ -125,6 +160,7 @@ class FreeBoardTest {
         String user = "1111";
         FreeBoard freeBoard = FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
@@ -153,6 +189,7 @@ class FreeBoardTest {
         String user = "1111";
         FreeBoard freeBoard = FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
@@ -180,6 +217,7 @@ class FreeBoardTest {
         String user = "1111";
         FreeBoard freeBoard = FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
@@ -208,6 +246,7 @@ class FreeBoardTest {
         String user = "1111";
         FreeBoard freeBoard = FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)
@@ -236,6 +275,7 @@ class FreeBoardTest {
         String user = "1111";
         FreeBoard freeBoard = FreeBoard.builder()
                 .id(1L)
+                .boardId("board-1")
                 .title("제목")
                 .contents("내용")
                 .countOfAnswer(0)

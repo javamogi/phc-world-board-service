@@ -1,7 +1,7 @@
 package com.phcworld.phcworldboardservice.infrastructure;
 
-import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearch;
-import com.phcworld.phcworldboardservice.infrastructure.port.FreeBoardSelectDto;
+import com.phcworld.phcworldboardservice.infrastructure.dto.FreeBoardSearch;
+import com.phcworld.phcworldboardservice.infrastructure.dto.FreeBoardSelectDto;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;

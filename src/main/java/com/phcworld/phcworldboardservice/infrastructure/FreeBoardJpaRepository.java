@@ -13,5 +13,5 @@ public interface FreeBoardJpaRepository extends JpaRepository<FreeBoardEntity, L
 //	@Query("select f from FreeBoard f join fetch f.writer")
 //	List<FreeBoard> findAllByFetch();
 
-	Optional<FreeBoardEntity> findById(Long boardId);
+	Optional<FreeBoardEntity> findByBoardId(String boardId);
 }

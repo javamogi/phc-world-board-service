@@ -1,19 +1,18 @@
 package com.phcworld.phcworldboardservice.service;
 
-import com.phcworld.phcworldboardservice.controller.port.FreeBoardSearch;
+import com.phcworld.phcworldboardservice.infrastructure.dto.FreeBoardSearch;
 import com.phcworld.phcworldboardservice.controller.port.WebclientService;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
 import com.phcworld.phcworldboardservice.exception.model.NotFoundException;
 import com.phcworld.phcworldboardservice.security.utils.SecurityUtil;
-import com.phcworld.phcworldboardservice.service.port.FreeBoardAnswerResponse;
-import com.phcworld.phcworldboardservice.service.port.UserResponse;
+import com.phcworld.phcworldboardservice.service.dto.FreeBoardAnswerResponse;
+import com.phcworld.phcworldboardservice.service.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;

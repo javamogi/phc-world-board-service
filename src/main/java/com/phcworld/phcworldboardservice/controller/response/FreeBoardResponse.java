@@ -1,9 +1,9 @@
-package com.phcworld.phcworldboardservice.controller.port;
+package com.phcworld.phcworldboardservice.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
-import com.phcworld.phcworldboardservice.service.port.FreeBoardAnswerResponse;
-import com.phcworld.phcworldboardservice.service.port.UserResponse;
+import com.phcworld.phcworldboardservice.service.dto.FreeBoardAnswerResponse;
+import com.phcworld.phcworldboardservice.service.dto.UserResponse;
 import com.phcworld.phcworldboardservice.utils.LocalDateTimeUtils;
 import lombok.Builder;
 
@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record FreeBoardResponse(
-        Long boardId,
+        String boardId,
         UserResponse writer,
         String title,
         String contents,
@@ -28,7 +28,7 @@ public record FreeBoardResponse(
 
     public static FreeBoardResponse of(FreeBoard freeBoard, UserResponse user){
         return FreeBoardResponse.builder()
-                .boardId(freeBoard.getId())
+                .boardId(freeBoard.getBoardId())
                 .title(freeBoard.getTitle())
                 .contents(freeBoard.getContents())
                 .writer(user)
@@ -42,7 +42,7 @@ public record FreeBoardResponse(
 
     public static FreeBoardResponse of(FreeBoard freeBoard){
         return FreeBoardResponse.builder()
-                .boardId(freeBoard.getId())
+                .boardId(freeBoard.getBoardId())
                 .title(freeBoard.getTitle())
                 .contents(freeBoard.getContents())
                 .isNew(freeBoard.isNew())
@@ -55,7 +55,7 @@ public record FreeBoardResponse(
 
     public static FreeBoardResponse of(FreeBoard freeBoard, UserResponse user, List<FreeBoardAnswerResponse> answers){
         return FreeBoardResponse.builder()
-                .boardId(freeBoard.getId())
+                .boardId(freeBoard.getBoardId())
                 .title(freeBoard.getTitle())
                 .contents(freeBoard.getContents())
                 .writer(user)
