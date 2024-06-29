@@ -8,8 +8,8 @@ import com.phcworld.phcworldboardservice.domain.FreeBoard;
 import com.phcworld.phcworldboardservice.exception.model.InternalServerErrorException;
 import com.phcworld.phcworldboardservice.exception.model.NotFoundException;
 import com.phcworld.phcworldboardservice.service.port.FreeBoardRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,10 +19,15 @@ import java.util.Map;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class AnswerConsumerImpl {
     private final FreeBoardRepository repository;
     private final ObjectMapper mapper;
+
+    public AnswerConsumerImpl(@Qualifier("jpaBoardRepository") FreeBoardRepository repository,
+                              ObjectMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
+    }
 
     @KafkaListener(topics = "answers")
     @Transactional

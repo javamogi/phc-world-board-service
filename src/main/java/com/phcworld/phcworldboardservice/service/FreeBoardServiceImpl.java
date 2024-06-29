@@ -14,6 +14,7 @@ import com.phcworld.phcworldboardservice.service.port.*;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 @Builder
 public class FreeBoardServiceImpl implements FreeBoardService {
@@ -33,6 +33,18 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 	private final UuidHolder uuidHolder;
 
 	private final WebclientService webclientService;
+
+	public FreeBoardServiceImpl(@Qualifier("jpaBoardRepository") FreeBoardRepository freeBoardRepository,
+								KafkaProducer boardProducer,
+								LocalDateTimeHolder localDateTimeHolder,
+								UuidHolder uuidHolder,
+								WebclientService webclientService) {
+		this.freeBoardRepository = freeBoardRepository;
+		this.boardProducer = boardProducer;
+		this.localDateTimeHolder = localDateTimeHolder;
+		this.uuidHolder = uuidHolder;
+		this.webclientService = webclientService;
+	}
 
 	@Override
 	public FreeBoard register(FreeBoardRequest request) {
@@ -49,12 +61,7 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<FreeBoard> getSearchList(FreeBoardSearch search) {
-		PageRequest pageRequest = PageRequest.of(
-				search.pageNum() - 1,
-				search.pageSize(),
-				Sort.by("createDate").descending());
-
-		return freeBoardRepository.findByKeyword(search, pageRequest);
+		return freeBoardRepository.findByKeyword(search);
 	}
 
 	@Override

@@ -43,7 +43,8 @@ public class FreeBoardJpaRepositoryCustomImpl implements FreeBoardJpaRepositoryC
 
         return queryFactory
                 .select(Projections.fields(FreeBoardSelectDto.class,
-                        freeBoard.id.as("boardId"),
+                        freeBoard.id,
+                        freeBoard.boardId,
                         freeBoard.writerId,
                         freeBoard.title,
                         freeBoard.contents,

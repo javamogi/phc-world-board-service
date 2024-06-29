@@ -5,6 +5,7 @@ import com.phcworld.phcworldboardservice.service.port.UuidHolder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @AllArgsConstructor
+@ToString
 public class FreeBoard {
     private Long id;
 
@@ -26,6 +28,20 @@ public class FreeBoard {
     private int countOfAnswer;
     Boolean isDeleteAuthority;
     Boolean isModifyAuthority;
+
+    public static FreeBoard from(FreeBoard freeBoard, UuidHolder uuidHolder) {
+        return FreeBoard.builder()
+                .boardId(uuidHolder.random())
+                .writerId(freeBoard.getWriterId())
+                .title(freeBoard.getTitle())
+                .contents(freeBoard.getContents())
+                .createDate(freeBoard.getCreateDate())
+                .updateDate(freeBoard.getUpdateDate())
+                .count(freeBoard.getCount())
+                .countOfAnswer(freeBoard.getCountOfAnswer())
+                .isDeleted(freeBoard.isDeleted())
+                .build();
+    }
 
     public Boolean isNew(){
         final int HOUR_OF_DAY = 24;

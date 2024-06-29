@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface FreeBoardRepository {
     List<FreeBoard> findByWriterId(String writerId);
-    List<FreeBoard> findByKeyword(FreeBoardSearch searchDto, Pageable pageable);
+    List<FreeBoard> findByKeyword(FreeBoardSearch searchDto);
     FreeBoard save(FreeBoard freeBoard);
     Optional<FreeBoard> findByBoardId(String boardId);
 

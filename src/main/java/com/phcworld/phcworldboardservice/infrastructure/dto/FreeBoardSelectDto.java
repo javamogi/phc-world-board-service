@@ -13,7 +13,8 @@ import java.time.LocalDateTime;
 public class FreeBoardSelectDto {
 
 //    private String boardId;
-    private Long boardId;
+    private Long id;
+    private String boardId;
     private String writerId;
     private String title;
     private String contents;
@@ -25,7 +26,8 @@ public class FreeBoardSelectDto {
 
     public FreeBoard toModel() {
         return FreeBoard.builder()
-                .id(boardId)
+                .id(id)
+                .boardId(boardId)
                 .writerId(writerId)
                 .title(title)
                 .contents(contents)

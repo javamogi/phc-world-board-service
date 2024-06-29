@@ -32,10 +32,7 @@ public class FreeBoardEntity {
 //	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "BOARD_SEQ_GENERATOR")
 	private Long id;
 
-//	@Column(nullable = false, unique = true)
-//	private String boardId;
-
-	@Column(nullable = false)
+	@Column(nullable = false, unique = true)
 	private String boardId;
 
 	@Column(nullable = false)

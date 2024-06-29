@@ -3,7 +3,9 @@ package com.phcworld.phcworldboardservice.mock;
 import com.phcworld.phcworldboardservice.infrastructure.dto.FreeBoardSearch;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
 import com.phcworld.phcworldboardservice.service.port.FreeBoardRepository;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +57,11 @@ public class FakeFreeBoardRepository implements FreeBoardRepository {
     }
 
     @Override
-    public List<FreeBoard> findByKeyword(FreeBoardSearch searchDto, Pageable pageable) {
+    public List<FreeBoard> findByKeyword(FreeBoardSearch searchDto) {
+        PageRequest pageRequest = PageRequest.of(
+                searchDto.pageNum() - 1,
+                searchDto.pageSize(),
+                Sort.by("createDate").descending());
         Stream<FreeBoard> stream = null;
         if(searchDto.searchType().equals(0)) {
             stream = data.stream()
@@ -68,8 +74,8 @@ public class FakeFreeBoardRepository implements FreeBoardRepository {
             stream = data.stream()
                     .filter(freeBoard -> ids.contains(freeBoard.getWriterId()));
         }
-        return stream.skip(pageable.getOffset() * pageable.getPageSize())
-                .limit(pageable.getPageSize())
+        return stream.skip(pageRequest.getOffset() * pageRequest.getPageSize())
+                .limit(pageRequest.getPageSize())
                 .toList();
     }
 }

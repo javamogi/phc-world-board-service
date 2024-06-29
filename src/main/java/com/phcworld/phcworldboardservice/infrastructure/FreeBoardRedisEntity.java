@@ -39,6 +39,7 @@ public class FreeBoardRedisEntity implements Serializable {
 
     public FreeBoard toModel() {
         return FreeBoard.builder()
+                .boardId(boardId)
                 .writerId(writerId)
                 .title(title)
                 .contents(contents)
