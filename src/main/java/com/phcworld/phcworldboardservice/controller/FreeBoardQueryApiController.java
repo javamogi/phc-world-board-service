@@ -55,21 +55,6 @@ public class FreeBoardQueryApiController {
                 .body(result);
     }
 
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "404", description = "요청 게시글 없음"),
-            @ApiResponse(responseCode = "409", description = "삭제된 게시글")
-    })
-    @GetMapping("/{freeBoardId}")
-    public ResponseEntity<FreeBoardResponse> getFreeBoardWithAnswers(@PathVariable(name = "freeBoardId") String freeBoardId,
-                                                                     @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        FreeBoard freeBoard = freeBoardService.getFreeBoard(freeBoardId);
-        UserResponse user = webclientService.getUser(token, freeBoard);
-        List<FreeBoardAnswerResponse> answers = webclientService.getAnswers(token, freeBoard);
-        return ResponseEntity
-                .ok()
-                .body(FreeBoardResponse.of(freeBoard, user, answers));
-    }
-
     @GetMapping("/users/{userId}")
     public ResponseEntity<List<FreeBoardResponse>> getFreeBoardsByUser(@PathVariable(name = "userId") String userId){
         List<FreeBoardResponse> result = freeBoardService.getFreeBoardsByUserId(userId)

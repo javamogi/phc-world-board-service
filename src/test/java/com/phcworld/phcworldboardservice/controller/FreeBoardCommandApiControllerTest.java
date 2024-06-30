@@ -367,4 +367,96 @@ class FreeBoardCommandApiControllerTest {
         });
     }
 
+    @Test
+    @DisplayName("회원은 게시글의 id로 게시글을 가져올 수 있다.")
+    void getFreeBoard(){
+        // given
+        LocalDateTime time = LocalDateTime.now();
+        TestContainer testContainer = TestContainer.builder()
+                .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
+                .build();
+        String userId = "1111";
+        testContainer.freeBoardRepository.save(FreeBoard.builder()
+                .id(1L)
+                .boardId("board-1")
+                .title("제목")
+                .contents("내용")
+                .countOfAnswer(0)
+                .count(0)
+                .writerId(userId)
+                .createDate(time)
+                .updateDate(time)
+                .isDeleted(false)
+                .build());
+        long id = 1;
+        Authentication authentication = new FakeAuthentication(userId, "test", Authority.ROLE_USER).getAuthentication();
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // when
+        ResponseEntity<FreeBoardResponse> result = testContainer.freeBoardCommandApiController.getFreeBoardWithAnswers(id, "1111");
+
+        // then
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(200));
+        assertThat(result.getBody()).isNotNull();
+        assertThat(result.getBody().boardId()).isEqualTo("board-1");
+        assertThat(result.getBody().title()).isEqualTo("제목");
+        assertThat(result.getBody().contents()).isEqualTo("내용");
+        assertThat(result.getBody().count()).isEqualTo(1);
+        assertThat(result.getBody().isNew()).isTrue();
+        assertThat(result.getBody().countOfAnswer()).isZero();
+        assertThat(result.getBody().createDate()).isEqualTo(LocalDateTimeUtils.getTime(time));
+    }
+
+    @Test
+    @DisplayName("id의 게시글이 없는 경우 게시글을 가져올 수 없다.")
+    void failedGetFreeBoardWhenNotFoundFreeBoard(){
+        // given
+        LocalDateTime time = LocalDateTime.now();
+        TestContainer testContainer = TestContainer.builder()
+                .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
+                .build();
+        String userId = "1111";
+        long freeBoardId = 1;
+        Authentication authentication = new FakeAuthentication(userId, "test", Authority.ROLE_USER).getAuthentication();
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // when
+        // then
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            testContainer.freeBoardCommandApiController.getFreeBoardWithAnswers(freeBoardId, "token");
+        });
+    }
+
+    @Test
+    @DisplayName("id의 게시글이 삭제된 경우 게시글을 가져올 수 없다.")
+    void failedGetFreeBoardWhenDeletedFreeBoard(){
+        // given
+        LocalDateTime time = LocalDateTime.now();
+        TestContainer testContainer = TestContainer.builder()
+                .localDateTimeHolder(new FakeLocalDateTimeHolder(time))
+                .build();
+        String user = "1111";
+        testContainer.freeBoardRepository.save(FreeBoard.builder()
+                .id(1L)
+                .boardId("board-1")
+                .title("제목")
+                .contents("내용")
+                .countOfAnswer(0)
+                .count(0)
+                .writerId(user)
+                .createDate(time)
+                .updateDate(time)
+                .isDeleted(true)
+                .build());
+        long id = 1;
+        Authentication authentication = new FakeAuthentication(user,"test", Authority.ROLE_USER).getAuthentication();
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // when
+        // then
+        Assertions.assertThrows(DeletedEntityException.class, () -> {
+            testContainer.freeBoardCommandApiController.getFreeBoardWithAnswers(id, "token");
+        });
+    }
+
 }
