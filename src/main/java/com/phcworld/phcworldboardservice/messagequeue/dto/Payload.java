@@ -10,6 +10,7 @@ import lombok.Getter;
 public class Payload {
     private Long id;
     private String writer_id;
+    private String board_id;
 //    private int count_of_answer;
     private byte is_deleted;
 //    private long create_date;

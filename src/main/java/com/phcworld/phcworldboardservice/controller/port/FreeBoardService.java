@@ -15,5 +15,5 @@ public interface FreeBoardService {
 
     FreeBoard existBoard(String boardId);
 
-    FreeBoard getFreeBoard(String boardId);
+    FreeBoard getFreeBoard(Long boardId);
 }

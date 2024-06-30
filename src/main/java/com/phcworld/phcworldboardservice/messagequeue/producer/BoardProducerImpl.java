@@ -27,6 +27,7 @@ public class BoardProducerImpl implements KafkaProducer {
         Payload payload = Payload.builder()
                 .id(board.getId())
                 .writer_id(board.getWriterId())
+                .board_id(board.getBoardId())
                 .is_deleted((byte)(Boolean.TRUE.equals(board.isDeleted()) ? 1 : 0))
                 .title(board.getTitle())
                 .contents(board.getContents())
@@ -44,14 +45,16 @@ public class BoardProducerImpl implements KafkaProducer {
                     new Field("string", false, "update_date"),
                     new Field("string", true, "title"),
                     new Field("string", true, "contents"),
-                    new Field("string", false, "writer_id"));
+                    new Field("string", false, "writer_id"),
+                    new Field("string", false, "board_id"));
         } else {
             fields = Arrays.asList(
                     new Field("int8", false, "is_deleted"),
                     new Field("string", false, "update_date"),
                     new Field("string", true, "title"),
                     new Field("string", true, "contents"),
-                    new Field("string", false, "writer_id"));
+                    new Field("string", false, "writer_id"),
+                    new Field("string", false, "board_id"));
         }
 
         Schema schema = Schema.builder()

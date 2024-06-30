@@ -47,6 +47,7 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 	}
 
 	@Override
+	@Transactional
 	public FreeBoard register(FreeBoardRequest request) {
 		String userId = SecurityUtil.getCurrentMemberId();
 
@@ -65,6 +66,7 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 	}
 
 	@Override
+	@Transactional
 	public FreeBoard update(FreeBoardRequest request) {
 		FreeBoard freeBoard = freeBoardRepository.findByBoardId(request.boardId())
 				.orElseThrow(NotFoundException::new);
@@ -89,6 +91,7 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 	}
 
 	@Override
+	@Transactional
 	public FreeBoard delete(String boardId) {
 		String userId = SecurityUtil.getCurrentMemberId();
 		Authority authorities = SecurityUtil.getAuthorities();
@@ -106,18 +109,21 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<FreeBoard> getFreeBoardsByUserId(String writerId) {
 		return freeBoardRepository.findByWriterId(writerId);
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public FreeBoard existBoard(String boardId){
 		return freeBoardRepository.findByBoardId(boardId).orElseThrow(NotFoundException::new);
 	}
 
 	@Override
-	public FreeBoard getFreeBoard(String boardId) {
-		FreeBoard freeBoard = freeBoardRepository.findByBoardId(boardId)
+	@Transactional
+	public FreeBoard getFreeBoard(Long boardId) {
+		FreeBoard freeBoard = freeBoardRepository.findById(boardId)
 				.orElseThrow(NotFoundException::new);
 		if(freeBoard.isDeleted()){
 			throw new DeletedEntityException();

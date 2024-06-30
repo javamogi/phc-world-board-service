@@ -213,7 +213,7 @@ class FreeBoardServiceImplTest {
     @DisplayName("회원은 게시글의 고유 id로 게시글을 가져올 수 있다.")
     void getFreeBoardByBoardId(){
         // given
-        String freeBoardId = "board-1";
+        long freeBoardId = 1;
         Authentication authentication = new FakeAuthentication("1111", "test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -222,7 +222,7 @@ class FreeBoardServiceImplTest {
 
         // then
         assertThat(result).isNotNull();
-        assertThat(result.getBoardId()).isEqualTo(freeBoardId);
+        assertThat(result.getBoardId()).isEqualTo("board-1");
         assertThat(result.getTitle()).isEqualTo("제목");
         assertThat(result.getContents()).isEqualTo("내용");
         assertThat(result.getCount()).isEqualTo(1);
@@ -236,7 +236,7 @@ class FreeBoardServiceImplTest {
     @DisplayName("id의 게시글이 없는 경우 게시글을 가져올 수 없다.")
     void failedGetFreeBoardWhenNotFoundFreeBoard(){
         // given
-        String boardId = "board-999";
+        long boardId = 999;
 
         // when
         // then
@@ -249,7 +249,7 @@ class FreeBoardServiceImplTest {
     @DisplayName("id의 게시글이 삭제된 경우 게시글을 가져올 수 없다.")
     void failedGetFreeBoardWhenDeletedFreeBoard(){
         // given
-        String boardId = "board-4";
+        long boardId = 4;
 
         // when
         // then
