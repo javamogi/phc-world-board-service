@@ -41,6 +41,7 @@ public class FreeBoardQueryApiController {
         List<FreeBoardResponse> result = freeBoards.stream()
                 .map(f -> {
                     return FreeBoardResponse.builder()
+                            .id(f.getId())
                             .boardId(f.getBoardId())
                             .title(f.getTitle())
                             .contents(f.getContents())
@@ -67,7 +68,7 @@ public class FreeBoardQueryApiController {
     }
 
     @GetMapping("/{freeBoardId}/exist")
-    public ResponseEntity<FreeBoardResponse> existFreeBoard(@PathVariable(name = "freeBoardId") String freeBoardId){
+    public ResponseEntity<FreeBoardResponse> existFreeBoard(@PathVariable(name = "freeBoardId") Long freeBoardId){
         FreeBoard result = freeBoardService.existBoard(freeBoardId);
         return ResponseEntity
                 .ok()

@@ -10,10 +10,10 @@ public interface FreeBoardService {
     FreeBoard register(FreeBoardRequest request);
     List<FreeBoard> getSearchList(FreeBoardSearch search);
     FreeBoard update(FreeBoardRequest request);
-    FreeBoard delete(String boardId);
+    FreeBoard delete(Long boardId);
     List<FreeBoard> getFreeBoardsByUserId(String userId);
 
-    FreeBoard existBoard(String boardId);
+    FreeBoard existBoard(Long boardId);
 
     FreeBoard getFreeBoard(Long boardId);
 }

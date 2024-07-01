@@ -12,6 +12,7 @@ import java.util.List;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record FreeBoardResponse(
+        Long id,
         String boardId,
         UserResponse writer,
         String title,
@@ -28,6 +29,7 @@ public record FreeBoardResponse(
 
     public static FreeBoardResponse of(FreeBoard freeBoard, UserResponse user){
         return FreeBoardResponse.builder()
+                .id(freeBoard.getId())
                 .boardId(freeBoard.getBoardId())
                 .title(freeBoard.getTitle())
                 .contents(freeBoard.getContents())
@@ -42,6 +44,7 @@ public record FreeBoardResponse(
 
     public static FreeBoardResponse of(FreeBoard freeBoard){
         return FreeBoardResponse.builder()
+                .id(freeBoard.getId())
                 .boardId(freeBoard.getBoardId())
                 .title(freeBoard.getTitle())
                 .contents(freeBoard.getContents())
@@ -55,6 +58,7 @@ public record FreeBoardResponse(
 
     public static FreeBoardResponse of(FreeBoard freeBoard, UserResponse user, List<FreeBoardAnswerResponse> answers){
         return FreeBoardResponse.builder()
+                .id(freeBoard.getId())
                 .boardId(freeBoard.getBoardId())
                 .title(freeBoard.getTitle())
                 .contents(freeBoard.getContents())

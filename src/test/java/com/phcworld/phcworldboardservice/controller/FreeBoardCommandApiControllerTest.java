@@ -101,7 +101,7 @@ class FreeBoardCommandApiControllerTest {
                 .isDeleted(false)
                 .build());
         FreeBoardRequest request = FreeBoardRequest.builder()
-                .boardId("board-1")
+                .id(1L)
                 .title("제목수정")
                 .contents("내용수정")
                 .build();
@@ -133,7 +133,7 @@ class FreeBoardCommandApiControllerTest {
                 .build();
         String userId = "1111";
         FreeBoardRequest request = FreeBoardRequest.builder()
-                .boardId("board-1")
+                .id(1L)
                 .title("제목수정")
                 .contents("내용수정")
                 .build();
@@ -169,7 +169,7 @@ class FreeBoardCommandApiControllerTest {
                 .isDeleted(true)
                 .build());
         FreeBoardRequest request = FreeBoardRequest.builder()
-                .boardId("board-1")
+                .id(1L)
                 .title("제목수정")
                 .contents("내용수정")
                 .build();
@@ -205,7 +205,7 @@ class FreeBoardCommandApiControllerTest {
                 .isDeleted(false)
                 .build());
         FreeBoardRequest request = FreeBoardRequest.builder()
-                .boardId("board-1")
+                .id(1L)
                 .title("제목수정")
                 .contents("내용수정")
                 .build();
@@ -242,7 +242,7 @@ class FreeBoardCommandApiControllerTest {
                 .build());
         Authentication authentication = new FakeAuthentication("1111", "test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String boardId = "board-1";
+        long boardId = 1;
 
         // when
         ResponseEntity<FreeBoardResponse> result = testContainer.freeBoardCommandApiController.delete(boardId, "token");
@@ -276,7 +276,7 @@ class FreeBoardCommandApiControllerTest {
                 .build());
         Authentication authentication = new FakeAuthentication("2222", "test2", Authority.ROLE_ADMIN).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String boardId = "board-1";
+        long boardId = 1;
 
         // when
         ResponseEntity<FreeBoardResponse> result = testContainer.freeBoardCommandApiController.delete(boardId, "token");
@@ -301,7 +301,7 @@ class FreeBoardCommandApiControllerTest {
         // when
         // then
         Assertions.assertThrows(NotFoundException.class, () -> {
-            testContainer.freeBoardCommandApiController.delete("board-1", "token");
+            testContainer.freeBoardCommandApiController.delete(1L, "token");
         });
     }
 
@@ -332,7 +332,7 @@ class FreeBoardCommandApiControllerTest {
         // when
         // then
         Assertions.assertThrows(DeletedEntityException.class, () -> {
-            testContainer.freeBoardCommandApiController.delete("board-1", "token");
+            testContainer.freeBoardCommandApiController.delete(1L, "token");
         });
     }
 
@@ -363,7 +363,7 @@ class FreeBoardCommandApiControllerTest {
         // when
         // then
         Assertions.assertThrows(ForbiddenException.class, () -> {
-            testContainer.freeBoardCommandApiController.delete("board-1", "token");
+            testContainer.freeBoardCommandApiController.delete(1L, "token");
         });
     }
 
