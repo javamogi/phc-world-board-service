@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -42,11 +43,12 @@ public class AnswerConsumerImpl {
         } catch (JsonProcessingException e){
             throw new InternalServerErrorException();
         }
-
-        Long boardId = (long) (int) map.get("free_board_id");
-        FreeBoard freeBoard = repository.findById(boardId)
-                .orElseThrow(NotFoundException::new);
-        freeBoard = freeBoard.addCountOfAnswer();
-        repository.save(freeBoard);
+        if(map.get("id") == null){
+            Long boardId = (long) (int) map.get("free_board_id");
+            FreeBoard freeBoard = repository.findById(boardId)
+                    .orElseThrow(NotFoundException::new);
+            freeBoard = freeBoard.addCountOfAnswer();
+            repository.save(freeBoard);
+        }
     }
 }
