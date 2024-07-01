@@ -245,7 +245,7 @@ class FreeBoardQueryApiControllerTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // when
-        ResponseEntity<FreeBoardResponse> result = testContainer.freeBoardQueryApiController.existFreeBoard("board-1");
+        ResponseEntity<FreeBoardResponse> result = testContainer.freeBoardQueryApiController.existFreeBoard(1L);
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(200));
@@ -273,7 +273,7 @@ class FreeBoardQueryApiControllerTest {
         // when
         // then
         Assertions.assertThrows(NotFoundException.class, () -> {
-            testContainer.freeBoardQueryApiController.existFreeBoard("board-1");
+            testContainer.freeBoardQueryApiController.existFreeBoard(1L);
         });
     }
 

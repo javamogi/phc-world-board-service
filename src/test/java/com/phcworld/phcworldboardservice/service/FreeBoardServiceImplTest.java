@@ -263,7 +263,7 @@ class FreeBoardServiceImplTest {
     void update(){
         // given
         FreeBoardRequest request = FreeBoardRequest.builder()
-                .boardId("board-1")
+                .id(1L)
                 .title("제목수정")
                 .contents("내용수정")
                 .build();
@@ -288,7 +288,7 @@ class FreeBoardServiceImplTest {
     void failedUpdateWhenNotFound(){
         // given
         FreeBoardRequest request = FreeBoardRequest.builder()
-                .boardId("board-999")
+                .id(999L)
                 .title("제목수정")
                 .contents("내용수정")
                 .build();
@@ -305,7 +305,7 @@ class FreeBoardServiceImplTest {
     void failedUpdateWhenDeleted(){
         // given
         FreeBoardRequest request = FreeBoardRequest.builder()
-                .boardId("board-4")
+                .id(4L)
                 .title("제목수정")
                 .contents("내용수정")
                 .build();
@@ -322,7 +322,7 @@ class FreeBoardServiceImplTest {
     void failedUpdateWhenNotEqualWriter(){
         // given
         FreeBoardRequest request = FreeBoardRequest.builder()
-                .boardId("board-1")
+                .id(1L)
                 .title("제목수정")
                 .contents("내용수정")
                 .build();
@@ -340,7 +340,7 @@ class FreeBoardServiceImplTest {
     @DisplayName("작성자는 게시글 ID로 삭제할 수 있다.")
     void delete(){
         // given
-        String boardId = "board-1";
+        long boardId = 1;
         Authentication authentication = new FakeAuthentication("1111", "test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -361,7 +361,7 @@ class FreeBoardServiceImplTest {
     @DisplayName("관리자는 게시글 ID로 삭제할 수 있다.")
     void deleteByAdmin(){
         // given
-        String id = "board-1";
+        long id = 1;
         Authentication authentication = new FakeAuthentication("1111", "test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -382,7 +382,7 @@ class FreeBoardServiceImplTest {
     @DisplayName("등록되지 않은 게시물은 삭제할 수 없다.")
     void failedDelteWhenNotFound(){
         // given
-        String id = "board-999";
+        long id = 999;
         Authentication authentication = new FakeAuthentication("1111", "test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -397,7 +397,7 @@ class FreeBoardServiceImplTest {
     @DisplayName("이미 삭제된 게시물은 삭제할 수 없다.")
     void failedDeleteWhenDeleted(){
         // given
-        String id = "board-4";
+        long id = 4;
         Authentication authentication = new FakeAuthentication("1111", "test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -412,7 +412,7 @@ class FreeBoardServiceImplTest {
     @DisplayName("작성자가 다르면 삭제할 수 없다.")
     void failedDeletedWhenNotEqualWriter(){
         // given
-        String id = "board-1";
+        long id = 1;
         Authentication authentication = new FakeAuthentication("2222", "test", Authority.ROLE_USER).getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -448,7 +448,7 @@ class FreeBoardServiceImplTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // when
-        FreeBoard result = freeBoardService.existBoard("board-1");
+        FreeBoard result = freeBoardService.existBoard(1L);
 
         // then
         assertThat(result).isNotNull();
@@ -464,7 +464,7 @@ class FreeBoardServiceImplTest {
         // when
         // then
         Assertions.assertThrows(NotFoundException.class, () -> {
-            freeBoardService.existBoard("board-00");
+            freeBoardService.existBoard(0L);
         });
     }
 }

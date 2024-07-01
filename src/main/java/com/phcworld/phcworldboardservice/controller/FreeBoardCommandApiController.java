@@ -60,7 +60,7 @@ public class FreeBoardCommandApiController {
             @ApiResponse(responseCode = "403", description = "삭제 권한 없음")
     })
     @DeleteMapping("/{boardId}")
-    public ResponseEntity<FreeBoardResponse> delete(@PathVariable(name = "boardId") String boardId,
+    public ResponseEntity<FreeBoardResponse> delete(@PathVariable(name = "boardId") Long boardId,
                                                     @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
         FreeBoard freeBoard = freeBoardService.delete(boardId);
         UserResponse user = webclientService.getUser(token, freeBoard);
