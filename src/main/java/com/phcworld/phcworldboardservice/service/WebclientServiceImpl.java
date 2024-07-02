@@ -1,5 +1,6 @@
 package com.phcworld.phcworldboardservice.service;
 
+import com.phcworld.phcworldboardservice.exception.model.ErrorCode;
 import com.phcworld.phcworldboardservice.infrastructure.dto.FreeBoardSearch;
 import com.phcworld.phcworldboardservice.controller.port.WebclientService;
 import com.phcworld.phcworldboardservice.domain.FreeBoard;
@@ -56,7 +57,8 @@ public class WebclientServiceImpl implements WebclientService {
                         .build(finalUserId))
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.just(new NotFoundException()))
+                .onStatus(HttpStatusCode::is4xxClientError,
+                        clientResponse -> Mono.just(new NotFoundException(ErrorCode.USER_NOT_FOUND)))
                 .bodyToMono(UserResponse.class)
                 .block();
     }
